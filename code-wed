@@ -9,8 +9,8 @@
 #include <LittleFS.h>
 
 // --- THÔNG TIN KẾT NỐI ---
-#define WIFI_SSID "BAOTRI6"
-#define WIFI_PASSWORD ""
+#define WIFI_SSID "TFCVIETNAM"
+#define WIFI_PASSWORD "L5ST10#VN"
 #define FIREBASE_HOST "wed-demo-d236a-default-rtdb.firebaseio.com"
 #define FIREBASE_AUTH "51DfTBzUyx0OX9uUqe4L4Aeg5j6rEjOZ7nd5Q3PN"
 
