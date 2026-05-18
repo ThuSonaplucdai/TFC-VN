@@ -1,0 +1,69 @@
+#include <Arduino.h>
+
+#define RX2_PIN 16
+#define TX2_PIN 17
+#define RE_DE_PIN 4
+
+// Cấu hình mốc thời gian để xác định hết 1 gói tin
+// Ở tốc độ 38400, khoảng cách giữa 2 byte trong cùng 1 gói thường < 1ms.
+// Nếu im lặng quá 4ms -> Chắc chắn đã kết thúc gói tin (Định nghĩa T3.5 của Modbus).
+const unsigned long TIMEOUT_KET_THUC_GOI = 4; 
+
+unsigned long thoi_diem_byte_cuoi = 0;
+unsigned long thoi_diem_bat_dau_goi = 0;
+unsigned long thoi_diem_het_goi_truoc = 0;
+bool dang_trong_goi_tin = false;
+int so_byte_dem_duoc = 0;
+
+void setup() {
+    Serial.begin(115200);
+    
+    // Khởi tạo Serial2 kết nối thẳng vào đường RS485 của máy (Baudrate 38400)
+    Serial2.begin(38400, SERIAL_8N1, RX2_PIN, TX2_PIN); 
+    
+    // Đưa module RS485 về chế độ LUÔN LUÔN NGHE (Read-Only)
+    pinMode(RE_DE_PIN, OUTPUT);
+    digitalWrite(RE_DE_PIN, LOW); 
+
+    Serial.println("\n==================================================");
+    Serial.println("[ANALYSER] BẮT ĐẦU ĐO ĐẠC CHU KỲ THỜI GIAN RS485");
+    Serial.println("==================================================");
+}
+
+void loop() {
+    // 1. Nhận biết khi bắt đầu có dữ liệu xuất hiện trên đường dây
+    if (Serial2.available() > 0) {
+        if (!dang_trong_goi_tin) {
+            dang_trong_goi_tin = true;
+            thoi_diem_bat_dau_goi = millis();
+            so_byte_dem_duoc = 0;
+        }
+
+        // Đọc hết các byte xuất hiện và đếm số lượng
+        while (Serial2.available() > 0) {
+            Serial2.read(); 
+            so_byte_dem_duoc++;
+        }
+        
+        // Cập nhật mốc thời gian của byte cuối cùng vừa nhận
+        thoi_diem_byte_cuoi = millis();
+    }
+
+    // 2. Kiểm tra nếu đường dây im lặng quá TIMEOUT -> Xác nhận kết thúc 1 gói tin
+    if (dang_trong_goi_tin && (millis() - thoi_diem_byte_cuoi > TIMEOUT_KET_THUC_GOI)) {
+        dang_trong_goi_tin = false;
+        
+        unsigned long thoi_gian_truyen_goi = thoi_diem_byte_cuoi - thoi_diem_bat_dau_goi;
+        unsigned long khoang_im_lang_truoc_do = thoi_diem_bat_dau_goi - thoi_diem_het_goi_truoc;
+        thoi_diem_het_goi_truoc = thoi_diem_byte_cuoi; // Lưu lại mốc để tính cho gói kế tiếp
+
+        // In kết quả phân tích ra Serial Monitor của máy tính
+        Serial.print("[Gói tin] Nhận: ");
+        Serial.print(so_byte_dem_duoc);
+        Serial.print(" bytes | Thời gian chiếm dây: ");
+        Serial.print(thoi_gian_truyen_goi);
+        Serial.print(" ms | Khoảng trống im lặng trước gói này: ");
+        Serial.print(khoang_im_lang_truoc_do);
+        Serial.println(" ms");
+    }
+}
