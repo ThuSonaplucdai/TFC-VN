@@ -6,60 +6,97 @@ function syncData() {
   var sheet = ss.getActiveSheet();
   
   try {
-    // 1. LẤY DỮ LIỆU TỪ FIREBASE
-    var response = UrlFetchApp.fetch(FIREBASE_URL + "data.json?auth=" + SECRET_KEY);
-    var d = JSON.parse(response.getContentText());
+    // 1. TẢI DỮ LIỆU TỪ NÚT "history" TRÊN FIREBASE
+    var response = UrlFetchApp.fetch(FIREBASE_URL + "history.json?auth=" + SECRET_KEY);
+    var firebaseData = JSON.parse(response.getContentText());
     
-    if (d && typeof d === 'object') {
-      // 2. TẠO THỜI GIAN VIỆT NAM (GMT+7)
-      var now = new Date();
-      var vnTime = Utilities.formatDate(now, "GMT+7", "HH:mm:ss dd/MM/yyyy");
-
-      // 3. XỬ LÝ TIÊU ĐỀ (Đảm bảo cột A luôn là Thời gian)
-      var headers = [];
-      if (sheet.getLastRow() > 0) {
-        headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
-      }
-
-      // Nếu cột đầu tiên chưa phải là "Thời gian", chúng ta chèn vào
-      if (headers[0] !== "Thời gian") {
-        sheet.insertColumnBefore(1);
-        sheet.getRange(1, 1).setValue("Thời gian").setFontWeight("bold");
-        headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
-      }
-
-      // 4. KIỂM TRA THÔNG SỐ MỚI ĐỂ TỰ SINH CỘT
-      for (var key in d) {
-        if (headers.indexOf(key) === -1) {
-          sheet.getRange(1, sheet.getLastColumn() + 1).setValue(key).setFontWeight("bold");
-          headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
-        }
-      }
-
-      // 5. CHUẨN BỊ DỮ LIỆU HÀNG
-      var rowData = new Array(headers.length).fill("");
-      rowData[0] = vnTime; // Ghi thời gian vào cột A
-
-      for (var key in d) {
-        var colIndex = headers.indexOf(key);
-        if (colIndex !== -1) {
-          rowData[colIndex] = d[key];
-        }
-      }
-      
-      // 6. GHI DỮ LIỆU VÀO HÀNG MỚI TIẾP THEO
-      sheet.appendRow(rowData);
-      
-      // 7. DỌN DẸP HÀNG TRỐNG (Để tránh lỗi 10 triệu ô như bạn gặp lúc nãy)
-      var lastRow = sheet.getLastRow();
-      var maxRows = sheet.getMaxRows();
-      if (maxRows > lastRow + 5) {
-        sheet.deleteRows(lastRow + 1, maxRows - lastRow);
-      }
-
-      Logger.log("Đã lưu hàng mới lúc: " + vnTime);
+    if (!firebaseData || typeof firebaseData !== 'object' || Object.keys(firebaseData).length === 0) {
+      Logger.log("Không có dữ liệu lịch sử nào trên Firebase.");
+      return;
     }
+    
+    // 2. CẤU HÌNH CỐ ĐỊNH CÁC CỘT DỮ LIỆU
+    var fixedHeaders = ["Ngày_Firebase", "Thời_Gian_Máy", "pressure", "temperature"]; 
+    var lastRow = sheet.getLastRow();
+    
+    // Nếu sheet mới hoàn toàn, tạo dòng tiêu đề
+    if (lastRow === 0) {
+      sheet.getRange(1, 1, 1, fixedHeaders.length).setValues([fixedHeaders]).setFontWeight("bold");
+      lastRow = 1;
+    }
+
+    // 3. LẤY DANH SÁCH NGÀY_GIỜ ĐÃ CÓ TRÊN SHEET ĐỂ LỌC LỌC TRÙNG
+    var existingCompositeKeys = [];
+    if (lastRow > 1) {
+      var existingDisplayData = sheet.getRange(2, 1, lastRow - 1, 2).getDisplayValues();
+      existingCompositeKeys = existingDisplayData.map(function(row) {
+        return row[0].toString().trim() + "_" + row[1].toString().trim();
+      });
+    }
+
+    // 4. LỌC DỮ LIỆU MỚI TỪ FIREBASE
+    var rowsToAppend = [];
+
+    for (var dateKey in firebaseData) {
+      var timeLogs = firebaseData[dateKey];
+      if (!timeLogs || typeof timeLogs !== 'object') continue;
+
+      for (var timeKey in timeLogs) {
+        var fDate = dateKey.toString().trim();
+        var fTime = timeKey.toString().trim();
+        var compositeKey = fDate + "_" + fTime;
+        
+        // Nếu Ngày_Giờ này đã tồn tại trên Sheet rồi -> Bỏ qua
+        if (existingCompositeKeys.indexOf(compositeKey) !== -1) {
+          continue; 
+        }
+
+        var record = timeLogs[timeKey];
+        if (!record || typeof record !== 'object') continue;
+
+        var rowData = new Array(fixedHeaders.length).fill("");
+        rowData[0] = fDate;  // Cột A: Ngày (YYYY-MM-DD)
+        rowData[1] = fTime;  // Cột B: Giờ (HH-mm)
+
+        for (var paramKey in record) {
+          var colIndex = fixedHeaders.indexOf(paramKey);
+          if (colIndex !== -1) {
+            rowData[colIndex] = record[paramKey];
+          }
+        }
+        rowsToAppend.push(rowData);
+      }
+    }
+
+    // 5. GHI DỮ LIỆU MỚI VÀ TIẾN HÀNH SẮP XẾP THEO ĐÚNG NGÀY GIỜ
+    if (rowsToAppend.length > 0) {
+      // Nối dữ liệu mới vào cuối sheet trước
+      sheet.getRange(sheet.getLastRow() + 1, 1, rowsToAppend.length, fixedHeaders.length).setValues(rowsToAppend);
+      Logger.log("Đã lưu thêm " + rowsToAppend.length + " mốc dữ liệu mới.");
+    }
+    
+    // THUẬT TOÁN TỰ ĐỘNG SẮP XẾP LẠI THEO NGÀY GIỜ CHUẨN:
+    var updatedLastRow = sheet.getLastRow();
+    if (updatedLastRow > 1) {
+      // Chọn toàn bộ vùng dữ liệu từ dòng 2 đến hết bảng tính
+      var sortRange = sheet.getRange(2, 1, updatedLastRow - 1, fixedHeaders.length);
+      
+      // Tiến hành Sort: Ưu tiên 1 xếp theo cột 1 (Ngày), Ưu tiên 2 xếp theo cột 2 (Giờ) tăng dần
+      sortRange.sort([
+        {column: 1, ascending: true}, 
+        {column: 2, ascending: true}
+      ]);
+      Logger.log("Hệ thống đã tự động sắp xếp lại toàn bộ dữ liệu tịnh tiến theo đúng Ngày và Giờ gốc.");
+    }
+
+    // 6. GIỚI HẠN VÀ GIỮ SẠCH CÁC HÀNG TRỐNG
+    var currentLastRow = sheet.getLastRow();
+    var maxRows = sheet.getMaxRows();
+    if (maxRows > currentLastRow + 5) {
+      sheet.deleteRows(currentLastRow + 1, maxRows - currentLastRow);
+    }
+
   } catch (e) {
-    Logger.log("Lỗi: " + e.toString());
+    Logger.log("Lỗi đồng bộ hoặc sắp xếp dữ liệu: " + e.toString());
   }
 }
