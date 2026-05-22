@@ -1,3 +1,4 @@
+#include <Arduino.h>
 #if defined(ESP8266)
   #include <ESP8266WiFi.h>
 #elif defined(ESP32)
@@ -8,85 +9,87 @@
 const char* ssid     = "BAOTRI6";
 const char* password = "";
 
-IPAddress serverIP(192, 168, 2, 201);  
-const uint16_t serverPort = 502;      
-const uint8_t SLAVE_ID = 1;           
-const uint16_t REG_ADDRESS = 0x7003;  
+IPAddress serverIP(192, 168, 2, 201); 
+const uint16_t serverPort = 502;
+const uint8_t SLAVE_ID = 2;
 
+const uint16_t START_REG = 0x100;
+const uint16_t SO_LUONG_REG = 2; // Đọc gộp 2 thanh ghi 0x100 và 0x101
+
+uint16_t resBuffer[2] = {0}; 
 ModbusIP mb;
-uint16_t res[1] = {0}; 
-bool canDisconnect = false;
 
-/* ========================================== CORE 1 ==========================================
-   TẠI SAO DÙNG: Hàm gọi lại bất đồng bộ (Callback Function) `khiCoDuLieuVe`.
-   THAY VÌ: Vòng lặp `while` kiểm tra `mb.isTransaction` kết hợp `delay()`.
-   LÝ DO: Sóng WiFi từ điện thoại (Hotspot) có độ trễ (Ping) rất cao và thất thường. Nếu dùng `while` 
-   với thời gian cố định, chip sẽ dễ bị thoát sớm khi mạng lag, dẫn đến đọc ra số 0. Dùng Callback 
-   giúp chip giải phóng luồng, "treo" lệnh đợi sẵn ở nền, khi nào sóng WiFi thực sự mang gói tin 
-   phản hồi về tới nơi thì hàm này mới tự kích hoạt. Tránh được 100% tình trạng Timeout ảo.
-   ============================================================================================ */
+bool dangChoData = false;
+bool chuKyHoanThanh = false;
+bool daChoDoiKetNoi = false; // Cờ chờ sau khi connect
+unsigned long thoiGianKetNoi = 0;
+
+void tinhToanFloat() {
+    uint32_t data32 = ((uint32_t)resBuffer[1] << 16) | resBuffer[0];
+    float ketQua;
+    memcpy(&ketQua, &data32, sizeof(float));
+    Serial.printf("\n🚀 KET QUA CUOI CUNG: %.3f\n", ketQua);
+}
+
 bool khiCoDuLieuVe(Modbus::ResultCode event, uint16_t transactionId, void* data) {
-  if (event == Modbus::EX_SUCCESS) {
-    Serial.print("👉 [THANH CONG] Gia tri thuc te tu bien tan: ");
-    Serial.println(res[0]);
-  } else {
-    Serial.printf("❌ [LOI MODBUS] Ma loi: 0x%02X\n", event);
-  }
-  
-  canDisconnect = true; 
-  return true;
+    dangChoData = false;
+    chuKyHoanThanh = true;
+    
+    if (event == Modbus::EX_SUCCESS) {
+        Serial.printf("👉 [OK] 0x100=%u, 0x101=%u\n", resBuffer[0], resBuffer[1]);
+        tinhToanFloat();
+    } else {
+        Serial.printf("❌ [LOI] Ma loi: 0x%02X - Huy tinh toan\n", event);
+    }
+    return true;
 }
 
 void setup() {
-  Serial.begin(115200);
-  WiFi.begin(ssid, password);
-  Serial.print("WiFi Connect");
-  while (WiFi.status() != WL_CONNECTED) { delay(500);  Serial.print("."); }
-  Serial.println("\nWiFi OK!");
-  mb.client();
+    Serial.begin(115200);
+    WiFi.begin(ssid, password);
+    while (WiFi.status() != WL_CONNECTED) { delay(500); Serial.print("."); }
+    Serial.println("\nWiFi OK!");
+    mb.client();
 }
 
 void loop() {
-  static unsigned long thoiGianTruoc = 0;
-  unsigned long thoiGianHienTai = millis();
+    static unsigned long thoiGianTruoc = 0;
+    unsigned long now = millis();
 
-  /* ========================================== CORE 2 ==========================================
-     TẠI SAO DÙNG: Quản lý thời gian bằng `millis()` định kỳ 5 giây.
-     THAY VÌ: Dùng hàm `delay(5000)` ở cuối hàm loop.
-     LÝ DO: Hàm `delay()` sẽ làm đóng băng toàn bộ chip. Trong khi đó, thư viện Modbus IP bắt buộc 
-     phải chạy hàm `mb.task()` liên tục không ngừng để nhận dữ liệu từ card mạng. Nếu dùng `delay(5000)`,
-     chip sẽ bị "mù" suốt 5 giây đó, gói tin phản hồi từ bộ không dây bay về sẽ bị rơi, không thể 
-     kích hoạt được hàm Callback Core 1.
-     ============================================================================================ */
-  if (thoiGianHienTai - thoiGianTruoc >= 5000) { 
-    thoiGianTruoc = thoiGianHienTai;
-
-    if (!mb.isConnected(serverIP)) {
-      Serial.println("[Tien Trinh] Mo cong TCP...");
-      mb.connect(serverIP, serverPort); 
-    } else {
-      Serial.println("[Tien Trinh] Gui lenh doc...");
-      canDisconnect = false; 
-      mb.readHreg(serverIP, REG_ADDRESS, res, 1, khiCoDuLieuVe, SLAVE_ID);
+    // 1. Chu kỳ 15 giây (Tránh trùng nhịp với Node-RED 55s)
+    if (now - thoiGianTruoc >= 15000) { 
+        thoiGianTruoc = now;
+        chuKyHoanThanh = false;
+        daChoDoiKetNoi = false;
+        Serial.println("\n🔄 === BAT DAU QUET ===");
     }
-  }
 
-  mb.task();
+    if (!chuKyHoanThanh) {
+        if (!mb.isConnected(serverIP)) {
+            mb.connect(serverIP, serverPort);
+        } else {
+            // Lớp bảo vệ: Chờ 500ms sau khi connect để Gateway IFD506 ổn định
+            if (!daChoDoiKetNoi) {
+                if (thoiGianKetNoi == 0) thoiGianKetNoi = millis();
+                if (millis() - thoiGianKetNoi > 500) {
+                    daChoDoiKetNoi = true;
+                }
+            } 
+            // Sau khi đã chờ đủ, mới gửi lệnh
+            else if (!dangChoData) {
+                dangChoData = true;
+                mb.readHreg(serverIP, START_REG, resBuffer, SO_LUONG_REG, khiCoDuLieuVe, SLAVE_ID);
+            }
+        }
+    } else {
+        // Ngắt kết nối ngay khi xong để giải phóng tài nguyên Gateway
+        if (mb.isConnected(serverIP)) {
+            mb.disconnect(serverIP);
+            thoiGianKetNoi = 0; // Reset timer cho lần sau
+            Serial.println("[TCP] Ngắt kết nối.");
+        }
+    }
 
-  /* ========================================== CORE 3 ==========================================
-     TẠI SAO DÙNG: Cờ hiệu `canDisconnect` để ngắt kết nối tại hàm `loop()`.
-     THAY VÌ: Gọi trực tiếp lệnh `mb.disconnect()` ngay bên trong hàm Callback Core 1.
-     LÝ DO: Hàm Callback hoạt động bên trong một luồng hệ thống (ngắt ngầm). Nếu gọi `disconnect()` 
-     ngay trong đó, cấu hình Socket TCP sẽ bị xóa sổ đột ngột khi tiến trình nền chưa kịp hoàn tất 
-     thủ tục dọn dẹp bộ nhớ đệm, gây ra lỗi con trỏ rỗng (Null Pointer) và kích hoạt lỗi sập nguồn 
-     hệ thống (Guru Meditation Error: Core 1 panic'ed). Đưa ra ngoài `loop` giúp việc ngắt cổng 502 
-     diễn ra an toàn tuyệt đối, chống kẹt mạng cho chu kỳ sau hoặc cho Node-RED.
-     ============================================================================================ */
-  if (canDisconnect) {
-    canDisconnect = false; 
-    Serial.println("[He Thong] Ngat TCP an toan ngoài Callback.\n");
-    mb.disconnect(serverIP);
-  }
-
-  delay(10); 
+    mb.task();
+    delay(10);
 }
