@@ -26,10 +26,10 @@ struct VariableMap {
 };
 
 VariableMap myVars[] = {
-    {0x704E, "temperature", 10.0,  true},  
+    {0x704E, "temperature", 1.0,  true},  
     {0x7003, "voltage",     1.0,   false}, 
     {0x7000, "frequency",   100.0, false}, 
-    {0x704D, "pressure",    10.0,  true}   
+    {0x704D, "pressure",    100.0,  true}   
 };
 
 const int NUM_VARS = sizeof(myVars) / sizeof(myVars[0]);
