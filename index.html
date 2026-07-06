@@ -107,11 +107,11 @@
                     <div style="display:flex; justify-content:space-between; border-bottom:1px solid #94a3b8; padding-bottom:5px; margin-bottom: 10px;"> <span style="font-weight:bold;">Maintenance</span> <button onclick="switchJaguar('jg-menu')" style="font-size:10px;">Back</button> </div>
                     <div style="display: flex; font-size: 9px; font-weight: bold; color: #475569; margin-bottom: 5px; text-align: center;"> <div style="flex: 2;">Item</div> <div style="flex: 1;">Cycle (h)</div> <div style="flex: 1;">Used (h)</div> </div>
                     <div id="maintenance-list" style="font-size: 10px; line-height: 1.4;">
-                        <div class="jg-list-item" style="padding: 4px 0; font-size: 10px;"><div style="flex: 2;">Air Filter</div><div style="flex: 1; text-align: center;" class="jg-blue">3000</div><div style="flex: 1; text-align: center; color: #15803d;" id="maint-air-used">--</div></div>
-                        <div class="jg-list-item" style="padding: 4px 0; font-size: 10px;"><div style="flex: 2;">Oil Filter</div><div style="flex: 1; text-align: center;" class="jg-blue">3000</div><div style="flex: 1; text-align: center; color: #15803d;" id="maint-oil-used">--</div></div>
-                        <div class="jg-list-item" style="padding: 4px 0; font-size: 10px;"><div style="flex: 2;">Oil-Gas Separator</div><div style="flex: 1; text-align: center;" class="jg-blue">3000</div><div style="flex: 1; text-align: center; color: #15803d;" id="maint-sep-used">--</div></div>
-                        <div class="jg-list-item" style="padding: 4px 0; font-size: 10px;"><div style="flex: 2;">Lubricating Oil</div><div style="flex: 1; text-align: center;" class="jg-blue">3000</div><div style="flex: 1; text-align: center; color: #15803d;" id="maint-lub-used">--</div></div>
-                        <div class="jg-list-item" style="padding: 4px 0; font-size: 10px;"><div style="flex: 2;">Motor Grease</div><div style="flex: 1; text-align: center;" class="jg-blue">3000</div><div style="flex: 1; text-align: center; color: #15803d;" id="maint-grease-used">--</div></div>
+                        <div class="jg-list-item" style="padding: 4px 0; font-size: 10px;"><div style="flex: 2;">Air Filter</div><div style="flex: 1; text-align: center;" class="jg-blue">4000</div><div style="flex: 1; text-align: center; color: #15803d;" id="maint-air-used">--</div></div>
+                        <div class="jg-list-item" style="padding: 4px 0; font-size: 10px;"><div style="flex: 2;">Oil Filter</div><div style="flex: 1; text-align: center;" class="jg-blue">4000</div><div style="flex: 1; text-align: center; color: #15803d;" id="maint-oil-used">--</div></div>
+                        <div class="jg-list-item" style="padding: 4px 0; font-size: 10px;"><div style="flex: 2;">Oil-Gas Separator</div><div style="flex: 1; text-align: center;" class="jg-blue">4000</div><div style="flex: 1; text-align: center; color: #15803d;" id="maint-sep-used">--</div></div>
+                        <div class="jg-list-item" style="padding: 4px 0; font-size: 10px;"><div style="flex: 2;">Lubricating Oil</div><div style="flex: 1; text-align: center;" class="jg-blue">4000</div><div style="flex: 1; text-align: center; color: #15803d;" id="maint-lub-used">--</div></div>
+                        <div class="jg-list-item" style="padding: 4px 0; font-size: 10px;"><div style="flex: 2;">Motor Grease</div><div style="flex: 1; text-align: center;" class="jg-blue">4000</div><div style="flex: 1; text-align: center; color: #15803d;" id="maint-grease-used">--</div></div>
                     </div>
                 </div>
                 <div id="jg-chart-page" class="jg-screen">
@@ -154,22 +154,28 @@
         function showPage(id) { document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); document.getElementById(id).classList.add('active'); }
         function switchJaguar(id) { document.querySelectorAll('.jg-screen').forEach(s => s.classList.remove('active')); document.getElementById(id).classList.add('active'); }
 
-        db.ref('data').on('value', (snap) => {
-            const d = snap.val() || {};
-            document.getElementById('val-temp-data').innerText = d.temperature || "--";
-            document.getElementById('val-power-data').innerText = d.total_power || "0";
-            document.getElementById('jg-p-val').innerText = d.pressure || "0.00";
-            document.getElementById('jg-t-val').innerText = d.temperature || "0";
-            document.getElementById('jg-v-val').innerText = d.voltage || "0";
-            document.getElementById('jg-f-val').innerText = d.frequency || "0.0";
-            document.getElementById('jg-p-val2').innerText = (d.pressure || "0.00") + " MPa";
-            document.getElementById('jg-t-val2').innerText = (d.temperature || "0") + " °C";
-            document.getElementById('jg-pw-val').innerText = (d.total_power || "0") + " kWh";
-            document.getElementById('maint-air-used').innerText = d.maint_air_used || "0";
-            document.getElementById('maint-oil-used').innerText = d.maint_oil_used || "0";
-            document.getElementById('maint-sep-used').innerText = d.maint_sep_used || "0";
-            document.getElementById('maint-lub-used').innerText = d.maint_lub_used || "0";
-            document.getElementById('maint-grease-used').innerText = d.maint_grease_used || "0";
+        db.ref('JAGUAR_1').on('value', (snap) => {
+            const d = snap.val();
+            if (!d) return;
+
+            // Cập nhật các thông số chính
+            document.getElementById('val-temp-data').innerText = d.temperature ?? "--";
+            document.getElementById('val-power-data').innerText = d.total_power ?? "--";
+            document.getElementById('jg-p-val').innerText = d.pressure ?? "--";
+            document.getElementById('jg-t-val').innerText = d.temperature ?? "--";
+            document.getElementById('jg-v-val').innerText = d.voltage ?? "--";
+            document.getElementById('jg-f-val').innerText = d.frequency ?? "--";
+            
+            document.getElementById('jg-p-val2').innerText = (d.pressure ?? "--") + " MPa";
+            document.getElementById('jg-t-val2').innerText = (d.temperature ?? "--") + " °C";
+            document.getElementById('jg-pw-val').innerText = (d.total_power ?? "--") + " kWh";
+            
+            // Cập nhật các thông số bảo trì
+            document.getElementById('maint-air-used').innerText = d.maint_air_used ?? "--";
+            document.getElementById('maint-oil-used').innerText = d.maint_oil_used ?? "--";
+            document.getElementById('maint-sep-used').innerText = d.maint_sep_used ?? "--";
+            document.getElementById('maint-lub-used').innerText = d.maint_lub_used ?? "--";
+            document.getElementById('maint-grease-used').innerText = d.maint_grease_used ?? "--";
         });
 
         function loadHistory() {
