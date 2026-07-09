@@ -42,6 +42,11 @@
         .checkbox-group { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
         input[type="datetime-local"] { padding: 2px; font-size: 9px; width: 100%; }
         .btn-filter { background: #15803d; color: white; border: none; padding: 6px; cursor: pointer; border-radius: 3px; font-weight: bold; }
+        
+        /* Style bổ sung cho Monitoring */
+        .ctl-btn { padding: 4px 8px; cursor: pointer; border: 1px solid #666; font-size: 10px; background: #e2e8f0; }
+        .toggle-btn { padding: 6px; cursor: pointer; border: none; color: white; font-size: 9px; font-weight: bold; opacity: 0.4; }
+        .toggle-btn.active { opacity: 1; outline: 2px solid #000; }
     </style>
 </head>
 <body>
@@ -94,33 +99,35 @@
                         <div class="jg-app"><div class="jg-icon" style="color:#3b82f6;">🕒</div><div class="jg-label">Timing</div></div>
                     </div>
                 </div>
+                
                 <div id="jg-more" class="jg-screen">
-                    <div style="display:flex; justify-content:space-between; border-bottom:1px solid #94a3b8; padding-bottom:5px;"> 
-                        <span style="font-weight:bold;">Monitoring</span> 
-                        <div>
-                            <button onclick="switchJaguar('jg-menu')" style="font-size:10px;">Back</button>
-                            <button onclick="switchJaguar('jg-chart-page')" style="font-size:10px; background:#0ea5e9; color:white; border:none; cursor:pointer;">Next >></button>
-                        </div>
+                    <div style="font-weight:bold; border-bottom:1px solid #94a3b8; padding-bottom:5px; margin-bottom:5px;">Monitoring (Real-time)</div>
+                    <div style="background:white; height:140px; width:100%; border:1px solid #666; margin-bottom:5px;">
+                        <canvas id="liveChart"></canvas>
                     </div>
-                    <div style="margin-top:10px;">
-                        <div class="jg-list-item">Pressure: <span id="jg-p-val2" class="jg-blue">--</span></div>
-                        <div class="jg-list-item">Temperature: <span id="jg-t-val2" class="jg-blue">--</span></div>
-                        <div class="jg-list-item">Total Power: <span id="jg-pw-val" class="jg-blue">--</span></div>
+                    <div style="display:flex; justify-content:center; gap:5px; margin-bottom:5px;">
+                        <button class="ctl-btn" onclick="switchJaguar('jg-chart-page')" style="background:#0ea5e9; color:white;">Next >> History</button>
+                    </div>
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px;">
+                        <button class="toggle-btn active" style="background:#ef4444;" onclick="updateMetric('temperature', this)">Temp</button>
+                        <button class="toggle-btn" style="background:#3b82f6;" onclick="updateMetric('pressure', this)">Press</button>
+                        <button class="toggle-btn" style="background:#eab308;" onclick="updateMetric('voltage', this)">Volt</button>
+                        <button class="toggle-btn" style="background:#22c55e;" onclick="updateMetric('frequency', this)">Freq</button>
                     </div>
                 </div>
+
                 <div id="jg-maintenance" class="jg-screen">
                     <div style="display:flex; justify-content:space-between; border-bottom:1px solid #94a3b8; padding-bottom:5px; margin-bottom: 10px;"> <span style="font-weight:bold;">Maintenance</span> <button onclick="switchJaguar('jg-menu')" style="font-size:10px;">Back</button> </div>
-                    <div style="display: flex; font-size: 9px; font-weight: bold; color: #475569; margin-bottom: 5px; text-align: center;"> <div style="flex: 2;">Item</div> <div style="flex: 1;">Cycle (h)</div> <div style="flex: 1;">Used (h)</div> </div>
                     <div id="maintenance-list" style="font-size: 10px; line-height: 1.4;">
-                        <div class="jg-list-item" style="padding: 4px 0; font-size: 10px;"><div style="flex: 2;">Air Filter</div><div style="flex: 1; text-align: center;" class="jg-blue">4000</div><div style="flex: 1; text-align: center; color: #15803d;" id="maint-air-used">--</div></div>
-                        <div class="jg-list-item" style="padding: 4px 0; font-size: 10px;"><div style="flex: 2;">Oil Filter</div><div style="flex: 1; text-align: center;" class="jg-blue">4000</div><div style="flex: 1; text-align: center; color: #15803d;" id="maint-oil-used">--</div></div>
-                        <div class="jg-list-item" style="padding: 4px 0; font-size: 10px;"><div style="flex: 2;">Oil-Gas Separator</div><div style="flex: 1; text-align: center;" class="jg-blue">4000</div><div style="flex: 1; text-align: center; color: #15803d;" id="maint-sep-used">--</div></div>
-                        <div class="jg-list-item" style="padding: 4px 0; font-size: 10px;"><div style="flex: 2;">Lubricating Oil</div><div style="flex: 1; text-align: center;" class="jg-blue">4000</div><div style="flex: 1; text-align: center; color: #15803d;" id="maint-lub-used">--</div></div>
-                        <div class="jg-list-item" style="padding: 4px 0; font-size: 10px;"><div style="flex: 2;">Motor Grease</div><div style="flex: 1; text-align: center;" class="jg-blue">4000</div><div style="flex: 1; text-align: center; color: #15803d;" id="maint-grease-used">--</div></div>
+                        <div class="jg-list-item"><div style="flex: 2;">Air Filter</div><div style="flex: 1; text-align: center;" class="jg-blue">4000</div><div style="flex: 1; text-align: center; color: #15803d;" id="maint-air-used">--</div></div>
+                        <div class="jg-list-item"><div style="flex: 2;">Oil Filter</div><div style="flex: 1; text-align: center;" class="jg-blue">4000</div><div style="flex: 1; text-align: center; color: #15803d;" id="maint-oil-used">--</div></div>
+                        <div class="jg-list-item"><div style="flex: 2;">Oil-Gas Separator</div><div style="flex: 1; text-align: center;" class="jg-blue">4000</div><div style="flex: 1; text-align: center; color: #15803d;" id="maint-sep-used">--</div></div>
+                        <div class="jg-list-item"><div style="flex: 2;">Lubricating Oil</div><div style="flex: 1; text-align: center;" class="jg-blue">4000</div><div style="flex: 1; text-align: center; color: #15803d;" id="maint-lub-used">--</div></div>
+                        <div class="jg-list-item"><div style="flex: 2;">Motor Grease</div><div style="flex: 1; text-align: center;" class="jg-blue">4000</div><div style="flex: 1; text-align: center; color: #15803d;" id="maint-grease-used">--</div></div>
                     </div>
                 </div>
                 <div id="jg-chart-page" class="jg-screen">
-                    <div style="display:flex; justify-content:space-between; border-bottom:1px solid #94a3b8; padding-bottom:5px;"> <span style="font-weight:bold;">History Chart</span> <button onclick="switchJaguar('jg-more')" style="font-size:10px;">Back</button> </div>
+                    <div style="display:flex; justify-content:space-between; border-bottom:1px solid #94a3b8; padding-bottom:5px;"> <span style="font-weight:bold;">History Chart</span> <button onclick="switchJaguar('jg-more')" style="font-size:10px;">◀ Back</button> </div>
                     <div class="chart-controls" style="margin-top:10px;">
                         <div style="display:flex; gap:5px;"><input type="datetime-local" id="start-date"><input type="datetime-local" id="end-date"></div>
                         <div class="checkbox-group">
@@ -144,30 +151,48 @@
     </div>
 
     <script>
-        const firebaseConfig = { apiKey: "AIzaSyBWRpQCnDWV5YQpoXZ_o7aqfGdv_7yUT38", authDomain: "wed-demo-d236a.firebaseapp.com", databaseURL: "https://wed-demo-d236a-default-rtdb.firebaseio.com", projectId: "wed-demo-d236a", storageBucket: "wed-demo-d236a.firebasestorage.app", messagingSenderId: "410178635616", appId: "1:410178635616:web:c4d513a888176847198005" };
+        const firebaseConfig = { apiKey: "AIzaSyBWRpQCnDWV5YQpoXZ_o7aqfGdv_7yUT38", databaseURL: "https://wed-demo-d236a-default-rtdb.firebaseio.com", projectId: "wed-demo-d236a" };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
+        
+        let activeMetric = 'temperature';
+        let liveChart = new Chart(document.getElementById('liveChart').getContext('2d'), { 
+            type: 'line', data: { labels: [], datasets: [{ label: 'Real-time', data: [], borderColor: '#ef4444' }] }, options: { responsive: true, maintainAspectRatio: false } 
+        });
 
         function showPage(id) { document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); document.getElementById(id).classList.add('active'); }
         function switchJaguar(id) { document.querySelectorAll('.jg-screen').forEach(s => s.classList.remove('active')); document.getElementById(id).classList.add('active'); }
 
+        function updateMetric(metric, btn) {
+            activeMetric = metric;
+            document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            liveChart.data.labels = [];
+            liveChart.data.datasets[0].data = [];
+        }
+
         db.ref('JAGUAR_1').on('value', (snap) => {
             const d = snap.val();
             if (!d) return;
-            document.getElementById('val-temp-data').innerText = d.temperature ?? "--";
-            document.getElementById('val-power-data').innerText = d.total_power ?? "--";
-            document.getElementById('jg-p-val').innerText = d.pressure ?? "--";
-            document.getElementById('jg-t-val').innerText = d.temperature ?? "--";
-            document.getElementById('jg-v-val').innerText = d.voltage ?? "--";
-            document.getElementById('jg-f-val').innerText = d.frequency ?? "--";
-            document.getElementById('jg-p-val2').innerText = (d.pressure ?? "--") + " MPa";
-            document.getElementById('jg-t-val2').innerText = (d.temperature ?? "--") + " °C";
-            document.getElementById('jg-pw-val').innerText = (d.total_power ?? "--") + " kWh";
-            document.getElementById('maint-air-used').innerText = d.maint_air_used ?? "--";
-            document.getElementById('maint-oil-used').innerText = d.maint_oil_used ?? "--";
-            document.getElementById('maint-sep-used').innerText = d.maint_sep_used ?? "--";
-            document.getElementById('maint-lub-used').innerText = d.maint_lub_used ?? "--";
-            document.getElementById('maint-grease-used').innerText = d.maint_grease_used ?? "--";
+            document.getElementById('val-temp-data').innerText = d.temperature;
+            document.getElementById('val-power-data').innerText = d.total_power;
+            document.getElementById('jg-p-val').innerText = d.pressure;
+            document.getElementById('jg-t-val').innerText = d.temperature;
+            document.getElementById('jg-v-val').innerText = d.voltage;
+            document.getElementById('jg-f-val').innerText = d.frequency;
+            document.getElementById('maint-air-used').innerText = d.maint_air_used;
+            document.getElementById('maint-oil-used').innerText = d.maint_oil_used;
+            document.getElementById('maint-sep-used').innerText = d.maint_sep_used;
+            document.getElementById('maint-lub-used').innerText = d.maint_lub_used;
+            document.getElementById('maint-grease-used').innerText = d.maint_grease_used;
+
+            const now = new Date().toLocaleTimeString().slice(0,8);
+            liveChart.data.labels.push(now);
+            liveChart.data.datasets[0].data.push(d[activeMetric]);
+            const colors = { temperature: '#ef4444', pressure: '#3b82f6', voltage: '#eab308', frequency: '#22c55e' };
+            liveChart.data.datasets[0].borderColor = colors[activeMetric];
+            if (liveChart.data.labels.length > 10) { liveChart.data.labels.shift(); liveChart.data.datasets[0].data.shift(); }
+            liveChart.update();
         });
 
         function loadHistory() {
