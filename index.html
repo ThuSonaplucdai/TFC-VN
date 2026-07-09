@@ -95,13 +95,18 @@
                     </div>
                 </div>
                 <div id="jg-more" class="jg-screen">
-                    <div style="display:flex; justify-content:space-between; border-bottom:1px solid #94a3b8; padding-bottom:5px;"> <span style="font-weight:bold;">Monitoring</span> <button onclick="switchJaguar('jg-menu')" style="font-size:10px;">Back</button> </div>
+                    <div style="display:flex; justify-content:space-between; border-bottom:1px solid #94a3b8; padding-bottom:5px;"> 
+                        <span style="font-weight:bold;">Monitoring</span> 
+                        <div>
+                            <button onclick="switchJaguar('jg-menu')" style="font-size:10px;">Back</button>
+                            <button onclick="switchJaguar('jg-chart-page')" style="font-size:10px; background:#0ea5e9; color:white; border:none; cursor:pointer;">Next >></button>
+                        </div>
+                    </div>
                     <div style="margin-top:10px;">
                         <div class="jg-list-item">Pressure: <span id="jg-p-val2" class="jg-blue">--</span></div>
                         <div class="jg-list-item">Temperature: <span id="jg-t-val2" class="jg-blue">--</span></div>
                         <div class="jg-list-item">Total Power: <span id="jg-pw-val" class="jg-blue">--</span></div>
                     </div>
-                    <button onclick="switchJaguar('jg-chart-page')" style="width:100%; margin-top:20px; padding:12px; background:#0ea5e9; color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer;">XEM BIỂU ĐỒ LỊCH SỬ 📈</button>
                 </div>
                 <div id="jg-maintenance" class="jg-screen">
                     <div style="display:flex; justify-content:space-between; border-bottom:1px solid #94a3b8; padding-bottom:5px; margin-bottom: 10px;"> <span style="font-weight:bold;">Maintenance</span> <button onclick="switchJaguar('jg-menu')" style="font-size:10px;">Back</button> </div>
@@ -139,15 +144,7 @@
     </div>
 
     <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyBWRpQCnDWV5YQpoXZ_o7aqfGdv_7yUT38",
-            authDomain: "wed-demo-d236a.firebaseapp.com",
-            databaseURL: "https://wed-demo-d236a-default-rtdb.firebaseio.com",
-            projectId: "wed-demo-d236a",
-            storageBucket: "wed-demo-d236a.firebasestorage.app",
-            messagingSenderId: "410178635616",
-            appId: "1:410178635616:web:c4d513a888176847198005"
-        };
+        const firebaseConfig = { apiKey: "AIzaSyBWRpQCnDWV5YQpoXZ_o7aqfGdv_7yUT38", authDomain: "wed-demo-d236a.firebaseapp.com", databaseURL: "https://wed-demo-d236a-default-rtdb.firebaseio.com", projectId: "wed-demo-d236a", storageBucket: "wed-demo-d236a.firebasestorage.app", messagingSenderId: "410178635616", appId: "1:410178635616:web:c4d513a888176847198005" };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
@@ -157,20 +154,15 @@
         db.ref('JAGUAR_1').on('value', (snap) => {
             const d = snap.val();
             if (!d) return;
-
-            // Cập nhật các thông số chính
             document.getElementById('val-temp-data').innerText = d.temperature ?? "--";
             document.getElementById('val-power-data').innerText = d.total_power ?? "--";
             document.getElementById('jg-p-val').innerText = d.pressure ?? "--";
             document.getElementById('jg-t-val').innerText = d.temperature ?? "--";
             document.getElementById('jg-v-val').innerText = d.voltage ?? "--";
             document.getElementById('jg-f-val').innerText = d.frequency ?? "--";
-            
             document.getElementById('jg-p-val2').innerText = (d.pressure ?? "--") + " MPa";
             document.getElementById('jg-t-val2').innerText = (d.temperature ?? "--") + " °C";
             document.getElementById('jg-pw-val').innerText = (d.total_power ?? "--") + " kWh";
-            
-            // Cập nhật các thông số bảo trì
             document.getElementById('maint-air-used').innerText = d.maint_air_used ?? "--";
             document.getElementById('maint-oil-used').innerText = d.maint_oil_used ?? "--";
             document.getElementById('maint-sep-used').innerText = d.maint_sep_used ?? "--";
@@ -179,41 +171,29 @@
         });
 
         function loadHistory() {
-    const start = new Date(document.getElementById('start-date').value).getTime();
-    const end = new Date(document.getElementById('end-date').value).getTime();
-    
-    if(!start || !end) return alert("Vui lòng chọn thời gian!");
-
-    db.ref('history').once('value', (snap) => {
-        const data = snap.val();
-        if (!data) return alert("Không có dữ liệu trong Firebase!");
-        
-        let labels = [], temps = [], press = [], volts = [], freqs = [];
-
-        Object.keys(data).forEach(d => {
-            const parts = d.split('-'); 
-            if (parts.length < 3) return; 
-            const isoDate = `${parts[2]}-${parts[1]}-${parts[0]}`; 
-            Object.keys(data[d]).forEach(t => {
-                const timeFormatted = t.replace(/-/g, ':'); 
-                const ts = new Date(`${isoDate}T${timeFormatted}`).getTime();
-                if(ts >= start && ts <= end) {
-                    labels.push(`${d} ${timeFormatted}`);
-                    temps.push(data[d][t].temperature || 0);
-                    press.push(data[d][t].pressure || 0);
-                    volts.push(data[d][t].voltage || 0);
-                    freqs.push(data[d][t].frequency || 0);
-                }
+            const start = new Date(document.getElementById('start-date').value).getTime();
+            const end = new Date(document.getElementById('end-date').value).getTime();
+            if(!start || !end) return alert("Vui lòng chọn thời gian!");
+            db.ref('history').once('value', (snap) => {
+                const data = snap.val();
+                if (!data) return alert("Không có dữ liệu!");
+                let labels = [], temps = [], press = [], volts = [], freqs = [];
+                Object.keys(data).forEach(d => {
+                    const parts = d.split('-');
+                    Object.keys(data[d]).forEach(t => {
+                        const ts = new Date(`${parts[2]}-${parts[1]}-${parts[0]}T${t.replace(/-/g, ':')}`).getTime();
+                        if(ts >= start && ts <= end) {
+                            labels.push(`${d} ${t.replace(/-/g, ':')}`);
+                            temps.push(data[d][t].temperature || 0);
+                            press.push(data[d][t].pressure || 0);
+                            volts.push(data[d][t].voltage || 0);
+                            freqs.push(data[d][t].frequency || 0);
+                        }
+                    });
+                });
+                renderChart(labels, temps, press, volts, freqs);
             });
-        });
-
-        if (labels.length > 0) {
-            renderChart(labels, temps, press, volts, freqs);
-        } else {
-            alert("Không có dữ liệu trong khoảng thời gian này!");
         }
-    });
-}
 
         function renderChart(labels, temps, press, volts, freqs) {
             const ctx = document.getElementById('historyChart').getContext('2d');
@@ -225,7 +205,6 @@
             if(document.getElementById('c-freq').checked) datasets.push({label: 'Freq', data: freqs, borderColor: '#22c55e'});
             window.myChart = new Chart(ctx, { type: 'line', data: { labels: labels, datasets: datasets }, options: { responsive: true, maintainAspectRatio: false } });
         }
-
         db.ref(".info/connected").on("value", (snap) => { document.getElementById('conn-status').innerText = snap.val() ? "📶 Online" : "❌ Offline"; });
     </script>
 </body>
