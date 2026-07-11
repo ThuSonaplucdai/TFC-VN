@@ -195,31 +195,60 @@
             liveChart.update();
         });
 
-        function loadHistory() {
-            const start = new Date(document.getElementById('start-date').value).getTime();
-            const end = new Date(document.getElementById('end-date').value).getTime();
-            if(!start || !end) return alert("Vui lòng chọn thời gian!");
-            db.ref('history').once('value', (snap) => {
-                const data = snap.val();
-                if (!data) return alert("Không có dữ liệu!");
-                let labels = [], temps = [], press = [], volts = [], freqs = [];
-                Object.keys(data).forEach(d => {
+       function loadHistory() {
+    const startDateStr = document.getElementById('start-date').value;
+    const endDateStr = document.getElementById('end-date').value;
+    if (!startDateStr || !endDateStr) return alert("Vui lòng chọn thời gian!");
+
+    const start = new Date(startDateStr).getTime();
+    const end = new Date(endDateStr).getTime();
+    const duration = end - start;
+    const numPoints = 20; 
+    const step = duration / numPoints;
+
+    db.ref('history').once('value', (snap) => {
+        const data = snap.val();
+        if (!data) return alert("Không có dữ liệu!");
+
+        let labels = [];
+        let results = { temp: [], press: [], volt: [], freq: [] };
+
+        for (let i = 0; i < numPoints; i++) {
+            let segmentStart = start + (i * step);
+            let segmentEnd = start + ((i + 1) * step);
+            let midPoint = (segmentStart + segmentEnd) / 2;
+            
+            labels.push(new Date(midPoint).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}));
+
+            let closestRecord = null;
+            let minDiff = Infinity;
+
+            // Tìm bản ghi có thời gian gần với midPoint nhất trong phạm vi segment
+            Object.keys(data).forEach(d => {
+                Object.keys(data[d]).forEach(t => {
                     const parts = d.split('-');
-                    Object.keys(data[d]).forEach(t => {
-                        const ts = new Date(`${parts[2]}-${parts[1]}-${parts[0]}T${t.replace(/-/g, ':')}`).getTime();
-                        if(ts >= start && ts <= end) {
-                            labels.push(`${d} ${t.replace(/-/g, ':')}`);
-                            temps.push(data[d][t].temperature || 0);
-                            press.push(data[d][t].pressure || 0);
-                            volts.push(data[d][t].voltage || 0);
-                            freqs.push(data[d][t].frequency || 0);
+                    const ts = new Date(`${parts[2]}-${parts[1]}-${parts[0]}T${t.replace(/-/g, ':')}`).getTime();
+                    
+                    if (ts >= segmentStart && ts < segmentEnd) {
+                        let diff = Math.abs(ts - midPoint);
+                        if (diff < minDiff) {
+                            minDiff = diff;
+                            closestRecord = data[d][t];
                         }
-                    });
+                    }
                 });
-                renderChart(labels, temps, press, volts, freqs);
             });
+
+            // Nếu tìm thấy bản ghi, lấy giá trị đó; nếu không thì null
+            results.temp.push(closestRecord ? closestRecord.temperature : null);
+            results.press.push(closestRecord ? closestRecord.pressure : null);
+            results.volt.push(closestRecord ? closestRecord.voltage : null);
+            results.freq.push(closestRecord ? closestRecord.frequency : null);
         }
 
+        renderChart(labels, results.temp, results.press, results.volt, results.freq);
+    });
+}
         function renderChart(labels, temps, press, volts, freqs) {
             const ctx = document.getElementById('historyChart').getContext('2d');
             if(window.myChart) window.myChart.destroy();
