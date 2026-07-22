@@ -101,7 +101,7 @@
                 </div>
                 
                 <div id="jg-more" class="jg-screen">
-                    <div style="font-weight:bold; border-bottom:1px solid #94a3b8; padding-bottom:5px; margin-bottom:5px;">Monitoring (Real-time)</div>
+                    <div style="font-weight:bold; border-bottom:1px solid #94a3b8; padding-bottom:5px; margin-bottom:5px;">Monitoring</div>
                     <div style="background:white; height:140px; width:100%; border:1px solid #666; margin-bottom:5px;">
                         <canvas id="liveChart"></canvas>
                     </div>
@@ -109,10 +109,10 @@
                         <button class="ctl-btn" onclick="switchJaguar('jg-chart-page')" style="background:#0ea5e9; color:white;">Next >> History</button>
                     </div>
                     <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px;">
-                        <button class="toggle-btn active" style="background:#ef4444;" onclick="updateMetric('temperature', this)">Temp</button>
-                        <button class="toggle-btn" style="background:#3b82f6;" onclick="updateMetric('pressure', this)">Press</button>
-                        <button class="toggle-btn" style="background:#eab308;" onclick="updateMetric('voltage', this)">Volt</button>
-                        <button class="toggle-btn" style="background:#22c55e;" onclick="updateMetric('frequency', this)">Freq</button>
+                        <button class="toggle-btn active" style="background:#ef4444;" onclick="updateMetric('temperature', 'Temp', this)">Temp</button>
+                        <button class="toggle-btn" style="background:#3b82f6;" onclick="updateMetric('pressure', 'Press', this)">Press</button>
+                        <button class="toggle-btn" style="background:#eab308;" onclick="updateMetric('voltage', 'Volt', this)">Volt</button>
+                        <button class="toggle-btn" style="background:#22c55e;" onclick="updateMetric('frequency', 'Freq', this)">Freq</button>
                     </div>
                 </div>
 
@@ -157,18 +157,20 @@
         
         let activeMetric = 'temperature';
         let liveChart = new Chart(document.getElementById('liveChart').getContext('2d'), { 
-            type: 'line', data: { labels: [], datasets: [{ label: 'Real-time', data: [], borderColor: '#ef4444' }] }, options: { responsive: true, maintainAspectRatio: false } 
+            type: 'line', data: { labels: [], datasets: [{ label: 'Temp', data: [], borderColor: '#ef4444' }] }, options: { responsive: true, maintainAspectRatio: false } 
         });
 
         function showPage(id) { document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); document.getElementById(id).classList.add('active'); }
         function switchJaguar(id) { document.querySelectorAll('.jg-screen').forEach(s => s.classList.remove('active')); document.getElementById(id).classList.add('active'); }
 
-        function updateMetric(metric, btn) {
+        function updateMetric(metric, labelName, btn) {
             activeMetric = metric;
             document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             liveChart.data.labels = [];
             liveChart.data.datasets[0].data = [];
+            liveChart.data.datasets[0].label = labelName;
+            liveChart.update();
         }
 
         db.ref('JAGUAR_1').on('value', (snap) => {
@@ -223,7 +225,6 @@
             let closestRecord = null;
             let minDiff = Infinity;
 
-            // Tìm bản ghi có thời gian gần với midPoint nhất trong phạm vi segment
             Object.keys(data).forEach(d => {
                 Object.keys(data[d]).forEach(t => {
                     const parts = d.split('-');
@@ -239,7 +240,6 @@
                 });
             });
 
-            // Nếu tìm thấy bản ghi, lấy giá trị đó; nếu không thì null
             results.temp.push(closestRecord ? closestRecord.temperature : null);
             results.press.push(closestRecord ? closestRecord.pressure : null);
             results.volt.push(closestRecord ? closestRecord.voltage : null);
