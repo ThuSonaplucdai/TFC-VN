@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hệ Thống Giám Sát Jaguar</title>
+    <title>Hệ Thống Giám Sát Đa Thiết Bị</title>
     
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
@@ -16,36 +16,52 @@
         .page.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .nav-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 30px; width: 100%; }
-        .btn-back { background: #334155; border: none; color: white; padding: 10px 18px; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        .btn-back { background: #334155; border: none; color: white; padding: 10px 18px; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.2s; }
+        .btn-back:hover { background: #475569; }
         .main-grid { display: grid; grid-template-columns: 1fr; gap: 20px; width: 100%; }
         .main-card { background: var(--card-bg); border: 1px solid #334155; padding: 40px; border-radius: 15px; text-align: center; font-size: 22px; font-weight: bold; cursor: pointer; transition: 0.3s; box-shadow: 0 4px 6px rgba(0,0,0,0.2); }
         .main-card:hover { border-color: var(--accent); background: #26334d; transform: translateY(-3px); }
-        .stats-container { background: var(--card-bg); padding: 50px; border-radius: 20px; text-align: center; border-top: 4px solid var(--accent); }
-        .big-val { font-size: 5.5rem; font-weight: 800; color: var(--accent); margin: 20px 0; }
-        .unit { font-size: 1.5rem; color: #94a3b8; }
+        
+        .device-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; width: 100%; margin-top: 20px; }
+        .device-btn-card { background: #334155; border: 2px solid #475569; padding: 25px; border-radius: 12px; text-align: center; font-size: 18px; font-weight: bold; cursor: pointer; color: white; transition: 0.2s; }
+        .device-btn-card:hover { background: var(--accent); color: #0f172a; border-color: var(--accent); }
+
+        /* Style cho đồng hồ đo đếm điện năng */
+        .meter-machine-frame { background: #cbd5e1; border: 10px solid #111; border-radius: 20px; color: #1e293b; overflow: hidden; max-width: 500px; margin: auto; box-shadow: 0 20px 40px rgba(0,0,0,0.6); font-family: monospace; }
+        .meter-top-bar { background: #94a3b8; padding: 6px 12px; display: flex; justify-content: space-between; font-weight: bold; font-size: 13px; border-bottom: 2px solid #64748b; }
+        .meter-content { height: 320px; padding: 15px; position: relative; background: #e2e8f0; display: flex; flex-direction: column; justify-content: space-around; }
+        .meter-screen { display: none; height: 100%; flex-direction: column; justify-content: space-around; }
+        .meter-screen.active { display: flex; }
+        .meter-row { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dashed #94a3b8; padding-bottom: 6px; }
+        .meter-label { font-size: 15px; font-weight: bold; color: #334155; }
+        .meter-val { font-size: 20px; font-weight: 800; color: #0f172a; }
+        .meter-unit { font-size: 13px; color: #475569; margin-left: 2px; }
+        .meter-nav-btns { display: flex; border-top: 2px solid #111; }
+        .m-btn { flex: 1; padding: 16px; text-align: center; color: white; cursor: pointer; border: 1px solid #111; font-weight: bold; font-size: 13px; background: #334155; transition: background 0.2s; }
+        .m-btn:hover { background: #475569; }
+
+        /* Style cho Jaguar */
         .jg-machine-frame { background: var(--jg-gray); border: 10px solid #111; border-radius: 20px; color: var(--jg-dark); overflow: hidden; max-width: 550px; margin: auto; box-shadow: 0 20px 40px rgba(0,0,0,0.6); }
         .jg-top-bar { background: #94a3b8; padding: 6px 15px; display: flex; justify-content: space-between; font-weight: bold; font-size: 12px; }
         .jg-content { height: 420px; padding: 15px; position: relative; background: #cbd5e1; }
         .jg-screen { display: none; height: 100%; }
         .jg-screen.active { display: block; }
         .jg-data-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .jg-box { background: white; border: 1px solid #64748b; padding: 10px; display: flex; justify-content: space-between; font-weight: bold; font-family: monospace; }
+        .jg-box { background: white; border: 1px solid #64748b; padding: 12px; display: flex; justify-content: space-between; font-weight: bold; font-family: monospace; border-radius: 6px; }
         .jg-blue { color: #0284c7; }
         .jg-app-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 10px; }
         .jg-app { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
         .jg-icon { width: 60px; height: 60px; background: white; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 28px; border: 1px solid #ccc; }
-        .jg-label { font-size: 11px; font-weight: bold; margin-top: 5px; }
+        .jg-label { font-size: 11px; font-weight: bold; margin-top: 5px; color: #1e293b; }
         .jg-list-item { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #94a3b8; font-weight: bold; }
         .jg-physical-btns { display: flex; border-top: 2px solid #111; }
         .p-btn { flex: 1; padding: 15px; text-align: center; color: white; cursor: pointer; border: 1px solid #111; font-weight: bold; font-size: 12px; }
-        .chart-controls { display: flex; flex-direction: column; gap: 5px; margin-bottom: 5px; font-size: 10px; }
-        .checkbox-group { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
-        input[type="datetime-local"] { padding: 2px; font-size: 9px; width: 100%; }
-        .btn-filter { background: #15803d; color: white; border: none; padding: 6px; cursor: pointer; border-radius: 3px; font-weight: bold; }
-        
-        /* Style bổ sung cho Monitoring */
-        .ctl-btn { padding: 4px 8px; cursor: pointer; border: 1px solid #666; font-size: 10px; background: #e2e8f0; }
-        .toggle-btn { padding: 6px; cursor: pointer; border: none; color: white; font-size: 9px; font-weight: bold; opacity: 0.4; }
+        .chart-controls { display: flex; flex-direction: column; gap: 8px; margin-bottom: 5px; font-size: 10px; }
+        .checkbox-group { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; font-weight: bold; }
+        input[type="datetime-local"] { padding: 4px; font-size: 10px; width: 100%; border: 1px solid #64748b; border-radius: 4px; }
+        .btn-filter { background: #15803d; color: white; border: none; padding: 8px; cursor: pointer; border-radius: 4px; font-weight: bold; }
+        .ctl-btn { padding: 4px 8px; cursor: pointer; border: 1px solid #666; font-size: 10px; background: #e2e8f0; border-radius: 4px; }
+        .toggle-btn { padding: 6px; cursor: pointer; border: none; color: white; font-size: 9px; font-weight: bold; opacity: 0.4; border-radius: 4px; }
         .toggle-btn.active { opacity: 1; outline: 2px solid #000; }
     </style>
 </head>
@@ -54,20 +70,97 @@
     <div id="layer1" class="page active">
         <h1 style="text-align:center; margin-bottom:40px;">HỆ THỐNG GIÁM SÁT TRUNG TÂM</h1>
         <div class="main-grid">
-            <div class="main-card" style="border-left: 8px solid #ef4444;" onclick="showPage('page-temp-tong')">1. GIÁM SÁT NHIỆT ĐỘ</div>
-            <div class="main-card" style="border-left: 8px solid #f59e0b;" onclick="showPage('page-power-tong')">2. ĐIỆN NĂNG TIÊU THỤ</div>
+            <div class="main-card" style="border-left: 8px solid #f59e0b;" onclick="showPage('page-device-list')">1. ĐIỆN NĂNG TIÊU THỤ </div>
+            <div class="main-card" style="border-left: 8px solid #ef4444;" onclick="showPage('page-temp-tong')">2. GIÁM SÁT NHIỆT ĐỘ</div>
             <div class="main-card" style="border-left: 8px solid #3b82f6;" onclick="showPage('page-sub-list')">3. HỆ THỐNG CON</div>
         </div>
     </div>
 
-    <div id="page-temp-tong" class="page">
-        <div class="nav-header"> <button class="btn-back" onclick="showPage('layer1')">← QUAY LẠI</button> <h2>NHIỆT ĐỘ HỆ THỐNG</h2> </div>
-        <div class="stats-container"><div class="big-val"><span id="val-temp-data">--</span><span class="unit">°C</span></div></div>
+    <!-- ========================================== -->
+    <!-- KHU VỰC 1: DANH SÁCH NÚT BẤM CHỌN THIẾT BỊ ĐO ĐIỆN -->
+    <!-- HƯỚNG DẪN: Muốn thêm thiết bị mới, hãy sao chép 1 dòng thẻ dưới đây và dán vào đây, -->
+    <!-- sau đó thay đổi số trong ngoặc đơn (ví dụ: openDevice('5')) và tên hiển thị (THIẾT BỊ 5). -->
+    <!-- ========================================== -->
+    <div id="page-device-list" class="page">
+        <div class="nav-header"> 
+            <button class="btn-back" onclick="showPage('layer1')">← QUAY LẠI</button> 
+            <h2>CHỌN THIẾT BỊ ĐO ĐIỆN NĂNG</h2> 
+        </div>
+        <div class="device-grid">
+            <!-- COPY DÒNG DƯỚI ĐÂY ĐỂ NHÂN BẢN THÊM -->
+            <div class="device-btn-card" onclick="openDevice('1')">THIẾT BỊ 1</div>
+            <div class="device-btn-card" onclick="openDevice('2')">THIẾT BỊ 2</div>
+            <div class="device-btn-card" onclick="openDevice('3')">THIẾT BỊ 3</div>
+            <div class="device-btn-card" onclick="openDevice('4')">THIẾT BỊ 4</div>
+            <!-- DÁN THÊM THIẾT BỊ MỚI VÀO ĐÂY (Ví dụ: Thiết bị 5) -->
+            <!-- <div class="device-btn-card" onclick="openDevice('5')">THIẾT BỊ 5</div> -->
+        </div>
     </div>
 
+    <!-- TRANG ĐIỆN NĂNG TIÊU THỤ TÍCH HỢP MÀN HÌNH ĐO PHA CHO TỪNG THIẾT BỊ -->
+    <!-- (Giao diện này dùng chung cho tất cả các thiết bị ở trên, tự động đổi dữ liệu theo ID bạn bấm) -->
     <div id="page-power-tong" class="page">
-        <div class="nav-header"> <button class="btn-back" onclick="showPage('layer1')">← QUAY LẠI</button> <h2>ĐIỆN NĂNG TỔNG</h2> </div>
-        <div class="stats-container"><div class="big-val"><span id="val-power-data">--</span><span class="unit">kWh</span></div></div>
+        <div class="nav-header"> 
+            <button class="btn-back" onclick="showPage('page-device-list')">← DANH SÁCH THIẾT BỊ</button> 
+            <h2 id="device-title">ĐIỆN NĂNG & THÔNG SỐ ĐIỆN</h2> 
+        </div>
+        
+        <div class="meter-machine-frame">
+            <div class="meter-top-bar"> 
+                <span id="meter-date">📅 2026.07.25</span> 
+                <span id="meter-time">🕒 23:58</span> 
+            </div>
+            <div class="meter-content">
+                <!-- Trang 1: Màn hình tổng quan giống ảnh mẫu -->
+                <div id="m-screen-1" class="meter-screen active">
+                    <div class="meter-row"><span class="meter-label">Vavg</span><span><span class="meter-val" id="val-vavg">--</span><span class="meter-unit">V</span></span></div>
+                    <div class="meter-row"><span class="meter-label">Aavg</span><span><span class="meter-val" id="val-aavg">--</span><span class="meter-unit">A</span></span></div>
+                    <div class="meter-row"><span class="meter-label">Ptot</span><span><span class="meter-val" id="val-ptot">--</span><span class="meter-unit">kW</span></span></div>
+                    <div class="meter-row"><span class="meter-label">Etot</span><span><span class="meter-val" id="val-etot">--</span><span class="meter-unit">kVArh</span></span></div>
+                </div>
+
+                <!-- Trang 2: Chỉ số pha A, B, C (Voltage) -->
+                <div id="m-screen-2" class="meter-screen">
+                    <div style="font-weight:bold; text-align:center; border-bottom:1px solid #94a3b8; padding-bottom:4px;">CHỈ SỐ PHA (VOLTAGE)</div>
+                    <div class="meter-row"><span class="meter-label">Phase A (Va)</span><span><span class="meter-val" id="val-va">--</span><span class="meter-unit">V</span></span></div>
+                    <div class="meter-row"><span class="meter-label">Phase B (Vb)</span><span><span class="meter-val" id="val-vb">--</span><span class="meter-unit">V</span></span></div>
+                    <div class="meter-row"><span class="meter-label">Phase C (Vc)</span><span><span class="meter-val" id="val-vc">--</span><span class="meter-unit">V</span></span></div>
+                </div>
+
+                <!-- Trang 3: Dòng điện pha A, B, C (Current) -->
+                <div id="m-screen-3" class="meter-screen">
+                    <div style="font-weight:bold; text-align:center; border-bottom:1px solid #94a3b8; padding-bottom:4px;">DÒNG ĐIỆN (CURRENT)</div>
+                    <div class="meter-row"><span class="meter-label">Phase A (Ia)</span><span><span class="meter-val" id="val-ia">--</span><span class="meter-unit">A</span></span></div>
+                    <div class="meter-row"><span class="meter-label">Phase B (Ib)</span><span><span class="meter-val" id="val-ib">--</span><span class="meter-unit">A</span></span></div>
+                    <div class="meter-row"><span class="meter-label">Phase C (Ic)</span><span><span class="meter-val" id="val-ic">--</span><span class="meter-unit">A</span></span></div>
+                </div>
+
+                <!-- Trang 4: Công suất (Pha A, Pha B, Pha C, Công suất tức thời, Công suất tổng) -->
+                <div id="m-screen-4" class="meter-screen">
+                    <div style="font-weight:bold; text-align:center; border-bottom:1px solid #94a3b8; padding-bottom:2px; font-size:13px;">CÔNG SUẤT (POWER)</div>
+                    <div class="meter-row" style="padding-bottom:2px;"><span class="meter-label">P.Pha A</span><span><span class="meter-val" id="val-pa" style="font-size:16px;">--</span><span class="meter-unit">kW</span></span></div>
+                    <div class="meter-row" style="padding-bottom:2px;"><span class="meter-label">P.Pha B</span><span><span class="meter-val" id="val-pb" style="font-size:16px;">--</span><span class="meter-unit">kW</span></span></div>
+                    <div class="meter-row" style="padding-bottom:2px;"><span class="meter-label">P.Pha C</span><span><span class="meter-val" id="val-pc" style="font-size:16px;">--</span><span class="meter-unit">kW</span></span></div>
+                    <div class="meter-row" style="padding-bottom:2px;"><span class="meter-label">P.Tức thời</span><span><span class="meter-val" id="val-pinst" style="font-size:16px;">--</span><span class="meter-unit">kW</span></span></div>
+                    <div class="meter-row" style="padding-bottom:2px;"><span class="meter-label">P.Tổng</span><span><span class="meter-val" id="val-ptot-page4" style="font-size:16px;">--</span><span class="meter-unit">kW</span></span></div>
+                </div>
+            </div>
+            
+            <!-- Nút bấm chuyển trang tuần tự bằng nút Next -->
+            <div class="meter-nav-btns">
+                <div class="m-btn" onclick="prevMeterScreen()" style="background: #475569;">◀ BACK</div>
+                <div class="m-btn" id="current-page-indicator" style="background: #1e293b; cursor: default;">TRANG 1 / 4</div>
+                <div class="m-btn" onclick="nextMeterScreen()" style="background: #0284c7;">NEXT ▶</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TRANG GIÁM SÁT NHIỆT ĐỘ -->
+    <div id="page-temp-tong" class="page">
+        <div class="nav-header"> <button class="btn-back" onclick="showPage('layer1')">← QUAY LẠI</button> <h2>NHIỆT ĐỘ HỆ THỐNG</h2> </div>
+        <div style="background: var(--card-bg); padding: 50px; border-radius: 20px; text-align: center; border-top: 4px solid var(--accent);">
+            <div style="font-size: 5.5rem; font-weight: 800; color: var(--accent); margin: 20px 0;"><span id="val-temp-data">--</span><span style="font-size: 1.5rem; color: #94a3b8;">°C</span></div>
+        </div>
     </div>
 
     <div id="page-sub-list" class="page">
@@ -155,13 +248,106 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
         
+        let currentMeterPage = 1;
+        const totalMeterPages = 4;
+        let currentActiveDevice = '1';
+        let currentDeviceListener = null;
+
+        function showPage(id) { document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); document.getElementById(id).classList.add('active'); }
+        function switchJaguar(id) { document.querySelectorAll('.jg-screen').forEach(s => s.classList.remove('active')); document.getElementById(id).classList.add('active'); }
+        
+        // ========================================== -->
+        // HỆ THỐNG TỰ ĐỘNG LIÊN KẾT FIREBASE CHO THIẾT BỊ MỚI:
+        // Đoạn code dưới đây tự động lấy dữ liệu từ nhánh tương ứng trên Firebase 
+        // dựa theo ID bạn truyền vào (Ví dụ: Thiết bị 5 sẽ tự động lấy dữ liệu từ nhánh `JAGUAR_5`).
+        // Bạn KHÔNG CẦN phải viết thêm code JavaScript nào khác khi thêm thiết bị mới!
+        // ========================================== -->
+        function openDevice(deviceId) {
+            currentActiveDevice = deviceId;
+            document.getElementById('device-title').innerText = `THÔNG SỐ ĐIỆN - THIẾT BỊ ${deviceId}`;
+            showPage('page-power-tong');
+            
+            if (currentDeviceListener) {
+                db.ref(`JAGUAR_${currentActiveDevice}`).off('value', currentDeviceListener);
+            }
+            
+            currentDeviceListener = db.ref(`JAGUAR_${currentActiveDevice}`).on('value', (snap) => {
+                const d = snap.val();
+                if (!d) {
+                    clearMeterValues();
+                    return;
+                }
+                
+                // Dữ liệu trang 1
+                if(d.v_avg) document.getElementById('val-vavg').innerText = d.v_avg;
+                if(d.a_avg) document.getElementById('val-aavg').innerText = d.a_avg;
+                if(d.total_power) {
+                    document.getElementById('val-ptot').innerText = d.total_power;
+                    document.getElementById('val-ptot-page4').innerText = d.total_power;
+                }
+                if(d.etot) document.getElementById('val-etot').innerText = d.etot;
+
+                // Dữ liệu trang 2 (Chỉ số pha)
+                document.getElementById('val-va').innerText = d.va || d.voltage || '--';
+                document.getElementById('val-vb').innerText = d.vb || '--';
+                document.getElementById('val-vc').innerText = d.vc || '--';
+                
+                // Dữ liệu trang 3 (Dòng điện pha)
+                document.getElementById('val-ia').innerText = d.ia || d.current_a || '--';
+                document.getElementById('val-ib').innerText = d.ib || d.current_b || '--';
+                document.getElementById('val-ic').innerText = d.ic || d.current_c || '--';
+
+                // Dữ liệu trang 4 (Công suất pha, tức thời, tổng)
+                document.getElementById('val-pa').innerText = d.pa || '--';
+                document.getElementById('val-pb').innerText = d.pb || '--';
+                document.getElementById('val-pc').innerText = d.pc || '--';
+                document.getElementById('val-pinst').innerText = d.p_inst || d.pa || '--'; 
+            });
+        }
+
+        function clearMeterValues() {
+            ['val-vavg', 'val-aavg', 'val-ptot', 'val-etot', 'val-va', 'val-vb', 'val-vc', 'val-ia', 'val-ib', 'val-ic', 'val-pa', 'val-pb', 'val-pc', 'val-pinst', 'val-ptot-page4'].forEach(id => {
+                document.getElementById(id).innerText = '--';
+            });
+        }
+
+        // Điều hướng Next / Prev tuần tự cho màn hình đo điện
+        function updateMeterScreenDisplay() {
+            document.querySelectorAll('.meter-screen').forEach(s => s.classList.remove('active'));
+            document.getElementById('m-screen-' + currentMeterPage).classList.add('active');
+            document.getElementById('current-page-indicator').innerText = `TRANG ${currentMeterPage} / ${totalMeterPages}`;
+        }
+
+        function nextMeterScreen() {
+            currentMeterPage++;
+            if (currentMeterPage > totalMeterPages) {
+                currentMeterPage = 1; 
+            }
+            updateMeterScreenDisplay();
+        }
+
+        function prevMeterScreen() {
+            currentMeterPage--;
+            if (currentMeterPage < 1) {
+                currentMeterPage = totalMeterPages; 
+            }
+            updateMeterScreenDisplay();
+        }
+
+        // Cập nhật đồng hồ thời gian thực
+        setInterval(() => {
+            const now = new Date();
+            const yyyy = now.getFullYear();
+            const mm = String(now.getMonth() + 1).padStart(2, '0');
+            const dd = String(now.getDate()).padStart(2, '0');
+            document.getElementById('meter-date').innerText = `📅 ${yyyy}.${mm}.${dd}`;
+            document.getElementById('meter-time').innerText = `🕒 ${now.toTimeString().slice(0,8)}`;
+        }, 1000);
+
         let activeMetric = 'temperature';
         let liveChart = new Chart(document.getElementById('liveChart').getContext('2d'), { 
             type: 'line', data: { labels: [], datasets: [{ label: 'Temp', data: [], borderColor: '#ef4444' }] }, options: { responsive: true, maintainAspectRatio: false } 
         });
-
-        function showPage(id) { document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); document.getElementById(id).classList.add('active'); }
-        function switchJaguar(id) { document.querySelectorAll('.jg-screen').forEach(s => s.classList.remove('active')); document.getElementById(id).classList.add('active'); }
 
         function updateMetric(metric, labelName, btn) {
             activeMetric = metric;
@@ -176,8 +362,9 @@
         db.ref('JAGUAR_1').on('value', (snap) => {
             const d = snap.val();
             if (!d) return;
+            
             document.getElementById('val-temp-data').innerText = d.temperature;
-            document.getElementById('val-power-data').innerText = d.total_power;
+
             document.getElementById('jg-p-val').innerText = d.pressure;
             document.getElementById('jg-t-val').innerText = d.temperature;
             document.getElementById('jg-v-val').innerText = d.voltage;
@@ -197,58 +384,59 @@
             liveChart.update();
         });
 
-       function loadHistory() {
-    const startDateStr = document.getElementById('start-date').value;
-    const endDateStr = document.getElementById('end-date').value;
-    if (!startDateStr || !endDateStr) return alert("Vui lòng chọn thời gian!");
+        function loadHistory() {
+            const startDateStr = document.getElementById('start-date').value;
+            const endDateStr = document.getElementById('end-date').value;
+            if (!startDateStr || !endDateStr) return alert("Vui lòng chọn thời gian!");
 
-    const start = new Date(startDateStr).getTime();
-    const end = new Date(endDateStr).getTime();
-    const duration = end - start;
-    const numPoints = 20; 
-    const step = duration / numPoints;
+            const start = new Date(startDateStr).getTime();
+            const end = new Date(endDateStr).getTime();
+            const duration = end - start;
+            const numPoints = 20; 
+            const step = duration / numPoints;
 
-    db.ref('history').once('value', (snap) => {
-        const data = snap.val();
-        if (!data) return alert("Không có dữ liệu!");
+            db.ref('history').once('value', (snap) => {
+                const data = snap.val();
+                if (!data) return alert("Không có dữ liệu!");
 
-        let labels = [];
-        let results = { temp: [], press: [], volt: [], freq: [] };
+                let labels = [];
+                let results = { temp: [], press: [], volt: [], freq: [] };
 
-        for (let i = 0; i < numPoints; i++) {
-            let segmentStart = start + (i * step);
-            let segmentEnd = start + ((i + 1) * step);
-            let midPoint = (segmentStart + segmentEnd) / 2;
-            
-            labels.push(new Date(midPoint).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}));
-
-            let closestRecord = null;
-            let minDiff = Infinity;
-
-            Object.keys(data).forEach(d => {
-                Object.keys(data[d]).forEach(t => {
-                    const parts = d.split('-');
-                    const ts = new Date(`${parts[2]}-${parts[1]}-${parts[0]}T${t.replace(/-/g, ':')}`).getTime();
+                for (let i = 0; i < numPoints; i++) {
+                    let segmentStart = start + (i * step);
+                    let segmentEnd = start + ((i + 1) * step);
+                    let midPoint = (segmentStart + segmentEnd) / 2;
                     
-                    if (ts >= segmentStart && ts < segmentEnd) {
-                        let diff = Math.abs(ts - midPoint);
-                        if (diff < minDiff) {
-                            minDiff = diff;
-                            closestRecord = data[d][t];
-                        }
-                    }
-                });
-            });
+                    labels.push(new Date(midPoint).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}));
 
-            results.temp.push(closestRecord ? closestRecord.temperature : null);
-            results.press.push(closestRecord ? closestRecord.pressure : null);
-            results.volt.push(closestRecord ? closestRecord.voltage : null);
-            results.freq.push(closestRecord ? closestRecord.frequency : null);
+                    let closestRecord = null;
+                    let minDiff = Infinity;
+
+                    Object.keys(data).forEach(d => {
+                        Object.keys(data[d]).forEach(t => {
+                            const parts = d.split('-');
+                            const ts = new Date(`${parts[2]}-${parts[1]}-${parts[0]}T${t.replace(/-/g, ':')}`).getTime();
+                            
+                            if (ts >= segmentStart && ts < segmentEnd) {
+                                let diff = Math.abs(ts - midPoint);
+                                if (diff < minDiff) {
+                                    minDiff = diff;
+                                    closestRecord = data[d][t];
+                                }
+                            }
+                        });
+                    });
+
+                    results.temp.push(closestRecord ? closestRecord.temperature : null);
+                    results.press.push(closestRecord ? closestRecord.pressure : null);
+                    results.volt.push(closestRecord ? closestRecord.voltage : null);
+                    results.freq.push(closestRecord ? closestRecord.frequency : null);
+                }
+
+                renderChart(labels, results.temp, results.press, results.volt, results.freq);
+            });
         }
 
-        renderChart(labels, results.temp, results.press, results.volt, results.freq);
-    });
-}
         function renderChart(labels, temps, press, volts, freqs) {
             const ctx = document.getElementById('historyChart').getContext('2d');
             if(window.myChart) window.myChart.destroy();
@@ -259,6 +447,7 @@
             if(document.getElementById('c-freq').checked) datasets.push({label: 'Freq', data: freqs, borderColor: '#22c55e'});
             window.myChart = new Chart(ctx, { type: 'line', data: { labels: labels, datasets: datasets }, options: { responsive: true, maintainAspectRatio: false } });
         }
+        
         db.ref(".info/connected").on("value", (snap) => { document.getElementById('conn-status').innerText = snap.val() ? "📶 Online" : "❌ Offline"; });
     </script>
 </body>
