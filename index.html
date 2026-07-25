@@ -76,17 +76,14 @@
         </div>
     </div>
 
-    <!-- KHU VỰC 1: DANH SÁCH NÚT BẤM CHỌN THIẾT BỊ ĐO ĐIỆN -->
+    <!-- KHU VỰC 1: DANH SÁCH NÚT BẤM CHỌN THIẾT BỊ ĐO ĐIỆN (Tự động sinh bằng JS) -->
     <div id="page-device-list" class="page">
         <div class="nav-header"> 
             <button class="btn-back" onclick="showPage('layer1')">← QUAY LẠI</button> 
             <h2>CHỌN THIẾT BỊ ĐO ĐIỆN NĂNG</h2> 
         </div>
-        <div class="device-grid">
-            <div class="device-btn-card" onclick="openDevice('1')">THIẾT BỊ 1</div>
-            <div class="device-btn-card" onclick="openDevice('2')">THIẾT BỊ 2</div>
-            <div class="device-btn-card" onclick="openDevice('3')">THIẾT BỊ 3</div>
-            <div class="device-btn-card" onclick="openDevice('4')">THIẾT BỊ 4</div>
+        <div class="device-grid" id="device-container">
+            <!-- Dữ liệu nút bấm sẽ được nạp tự động từ mảng meterDevices ở script bên dưới -->
         </div>
     </div>
 
@@ -154,13 +151,16 @@
         </div>
     </div>
 
+    <!-- TRANG DANH SÁCH HỆ THỐNG CON (Tự động sinh bằng JS) -->
     <div id="page-sub-list" class="page">
         <div class="nav-header"> <button class="btn-back" onclick="showPage('layer1')">← QUAY LẠI</button> <h2>DANH SÁCH THIẾT BỊ</h2> </div>
-        <div class="main-card" onclick="showPage('page-jaguar-ui')" style="background: #334155;">[ID: JAG-01] MÁY NÉN KHÍ JAGUAR</div>
+        <div class="main-grid" id="sub-device-container">
+            <!-- Dữ liệu hệ thống con sẽ được nạp tự động từ mảng subSystems ở script bên dưới -->
+        </div>
     </div>
 
     <div id="page-jaguar-ui" class="page">
-        <div class="nav-header"> <button class="btn-back" onclick="showPage('page-sub-list')">← DANH SÁCH</button> <h3>JAGUAR CONTROL UNIT</h3> </div>
+        <div class="nav-header"> <button class="btn-back" onclick="showPage('page-sub-list')">← DANH SÁCH</button> <h3 id="sub-device-title">JAGUAR CONTROL UNIT</h3> </div>
         <div class="jg-machine-frame">
             <div class="jg-top-bar"> <span>捷豹 JAGUAR</span> <span id="conn-status">📶 Online</span> </div>
             <div class="jg-content">
@@ -243,10 +243,33 @@
         const totalMeterPages = 4;
         let currentActiveDevice = '1';
         let currentDeviceListener = null;
+        let currentSubListener = null;
 
         function showPage(id) { document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); document.getElementById(id).classList.add('active'); }
         function switchJaguar(id) { document.querySelectorAll('.jg-screen').forEach(s => s.classList.remove('active')); document.getElementById(id).classList.add('active'); }
-        
+
+        // ==========================================
+        // 1. CẤU HÌNH DANH SÁCH THIẾT BỊ ĐO ĐIỆN 
+        // ==========================================
+        const meterDevices = [
+            { id: '1', name: 'THIẾT BỊ 1' },
+            { id: '2', name: 'THIẾT BỊ 2' },
+            { id: '3', name: 'THIẾT BỊ 3' },
+            { id: '4', name: 'THIẾT BỊ 4' },
+            { id: '5', name: 'THIẾT BỊ 5' }
+            // Muốn thêm thiết bị 5? Chỉ cần thêm: { id: '5', name: 'THIẾT BỊ 5' },
+        ];
+
+        const deviceContainer = document.getElementById('device-container');
+        deviceContainer.innerHTML = '';
+        meterDevices.forEach(dev => {
+            const btnCard = document.createElement('div');
+            btnCard.className = 'device-btn-card';
+            btnCard.innerText = dev.name;
+            btnCard.onclick = () => openDevice(dev.id);
+            deviceContainer.appendChild(btnCard);
+        });
+
         function openDevice(deviceId) {
             currentActiveDevice = deviceId;
             document.getElementById('device-title').innerText = `THÔNG SỐ ĐIỆN - THIẾT BỊ ${deviceId}`;
@@ -256,14 +279,14 @@
                 db.ref(`METER_${currentActiveDevice}`).off('value', currentDeviceListener);
             }
             
-            currentDeviceListener = db.ref(`METER_${currentActiveDevice}`).on('value', (snap) => {
+            currentDeviceListener = db.ref(`METER_${deviceId}`).on('value', (snap) => {
                 const d = snap.val();
                 if (!d) {
                     clearMeterValues();
                     return;
                 }
                 
-                // Dữ liệu trang 1
+                // Dữ liệu trang 1 (Tổng quan)
                 document.getElementById('val-vavg').innerText = d.v_avg || '--';
                 document.getElementById('val-aavg').innerText = d.a_avg || '--';
                 document.getElementById('val-ptot').innerText = d.congsuattucthoi || '--';
@@ -302,17 +325,13 @@
 
         function nextMeterScreen() {
             currentMeterPage++;
-            if (currentMeterPage > totalMeterPages) {
-                currentMeterPage = 1; 
-            }
+            if (currentMeterPage > totalMeterPages) currentMeterPage = 1; 
             updateMeterScreenDisplay();
         }
 
         function prevMeterScreen() {
             currentMeterPage--;
-            if (currentMeterPage < 1) {
-                currentMeterPage = totalMeterPages; 
-            }
+            if (currentMeterPage < 1) currentMeterPage = totalMeterPages; 
             updateMeterScreenDisplay();
         }
 
@@ -340,29 +359,67 @@
             liveChart.update();
         }
 
+        // ==========================================
+        // 2. CẤU HÌNH DANH SÁCH HỆ THỐNG CON
+        // ==========================================
+        const subSystems = [
+            { id: 'JAGUAR_1', code: 'JAG-01', name: 'MÁY NÉN KHÍ JAGUAR 1' },
+            { id: 'JAGUAR_2', code: 'JAG-02', name: 'MÁY NÉN KHÍ JAGUAR 2' }
+            // Muốn thêm máy nén khí thứ 2? Chỉ cần thêm: { id: 'JAGUAR_2', code: 'JAG-02', name: 'MÁY NÉN KHÍ JAGUAR 2' },
+        ];
+
+        const subContainer = document.getElementById('sub-device-container');
+        subContainer.innerHTML = '';
+        subSystems.forEach(sys => {
+            const card = document.createElement('div');
+            card.className = 'main-card';
+            card.style.background = '#334155';
+            card.innerText = `[ID: ${sys.code}] ${sys.name}`;
+            card.onclick = () => openSubSystem(sys.id, sys.name);
+            subContainer.appendChild(card);
+        });
+
+        function openSubSystem(firebaseKey, sysName) {
+            document.getElementById('sub-device-title').innerText = sysName;
+            showPage('page-jaguar-ui');
+
+            if (currentSubListener) {
+                db.ref(currentSubListener).off('value');
+            }
+            
+            currentSubListener = firebaseKey;
+            db.ref(firebaseKey).on('value', (snap) => {
+                const d = snap.val();
+                if (!d) return;
+                
+                document.getElementById('val-temp-data').innerText = d.temperature || '--';
+                document.getElementById('jg-p-val').innerText = d.pressure || '--';
+                document.getElementById('jg-t-val').innerText = d.temperature || '--';
+                document.getElementById('jg-v-val').innerText = d.voltage || '--';
+                document.getElementById('jg-f-val').innerText = d.frequency || '--';
+                
+                document.getElementById('maint-air-used').innerText = d.maint_air_used || '--';
+                document.getElementById('maint-oil-used').innerText = d.maint_oil_used || '--';
+                document.getElementById('maint-sep-used').innerText = d.maint_sep_used || '--';
+                document.getElementById('maint-lub-used').innerText = d.maint_lub_used || '--';
+                document.getElementById('maint-grease-used').innerText = d.maint_grease_used || '--';
+
+                const now = new Date().toLocaleTimeString().slice(0,8);
+                liveChart.data.labels.push(now);
+                liveChart.data.datasets[0].data.push(d[activeMetric] || 0);
+                const colors = { temperature: '#ef4444', pressure: '#3b82f6', voltage: '#eab308', frequency: '#22c55e' };
+                liveChart.data.datasets[0].borderColor = colors[activeMetric];
+                if (liveChart.data.labels.length > 10) { liveChart.data.labels.shift(); liveChart.data.datasets[0].data.shift(); }
+                liveChart.update();
+            });
+        }
+
+        // Lấy dữ liệu cho trang Giám sát nhiệt độ đơn lẻ nếu có nhánh riêng
         db.ref('JAGUAR_1').on('value', (snap) => {
             const d = snap.val();
-            if (!d) return;
-            
-            document.getElementById('val-temp-data').innerText = d.temperature;
-
-            document.getElementById('jg-p-val').innerText = d.pressure;
-            document.getElementById('jg-t-val').innerText = d.temperature;
-            document.getElementById('jg-v-val').innerText = d.voltage;
-            document.getElementById('jg-f-val').innerText = d.frequency;
-            document.getElementById('maint-air-used').innerText = d.maint_air_used;
-            document.getElementById('maint-oil-used').innerText = d.maint_oil_used;
-            document.getElementById('maint-sep-used').innerText = d.maint_sep_used;
-            document.getElementById('maint-lub-used').innerText = d.maint_lub_used;
-            document.getElementById('maint-grease-used').innerText = d.maint_grease_used;
-
-            const now = new Date().toLocaleTimeString().slice(0,8);
-            liveChart.data.labels.push(now);
-            liveChart.data.datasets[0].data.push(d[activeMetric]);
-            const colors = { temperature: '#ef4444', pressure: '#3b82f6', voltage: '#eab308', frequency: '#22c55e' };
-            liveChart.data.datasets[0].borderColor = colors[activeMetric];
-            if (liveChart.data.labels.length > 10) { liveChart.data.labels.shift(); liveChart.data.datasets[0].data.shift(); }
-            liveChart.update();
+            if (d && d.temperature) {
+                document.getElementById('val-temp-data').innerText = d.temperature;
+            }
         });
 
         function loadHistory() {
