@@ -26,7 +26,6 @@
         .device-btn-card { background: #334155; border: 2px solid #475569; padding: 25px; border-radius: 12px; text-align: center; font-size: 18px; font-weight: bold; cursor: pointer; color: white; transition: 0.2s; }
         .device-btn-card:hover { background: var(--accent); color: #0f172a; border-color: var(--accent); }
 
-        /* Khung màn hình phong cách máy đo điện công nghiệp */
         .meter-machine-frame { background: #cbd5e1; border: 10px solid #111; border-radius: 20px; color: #1e293b; overflow: hidden; max-width: 500px; margin: auto; box-shadow: 0 20px 40px rgba(0,0,0,0.6); font-family: monospace; }
         .meter-top-bar { background: #94a3b8; padding: 6px 12px; display: flex; justify-content: space-between; font-weight: bold; font-size: 13px; border-bottom: 2px solid #64748b; }
         .meter-content { height: 320px; padding: 15px; position: relative; background: #e2e8f0; display: flex; flex-direction: column; justify-content: space-around; }
@@ -40,7 +39,6 @@
         .m-btn { flex: 1; padding: 16px; text-align: center; color: white; cursor: pointer; border: 1px solid #111; font-weight: bold; font-size: 13px; background: #334155; transition: background 0.2s; }
         .m-btn:hover { background: #475569; }
 
-        /* Style hoàn chỉnh cho Jaguar - Đã sửa lỗi bằng min-height */
         .jg-machine-frame { background: var(--jg-gray); border: 10px solid #111; border-radius: 20px; color: var(--jg-dark); overflow: hidden; max-width: 550px; margin: auto; box-shadow: 0 20px 40px rgba(0,0,0,0.6); }
         .jg-top-bar { background: #94a3b8; padding: 6px 15px; display: flex; justify-content: space-between; font-weight: bold; font-size: 12px; }
         .jg-content { min-height: 440px; padding: 15px; position: relative; background: #cbd5e1; }
@@ -76,7 +74,6 @@
         </div>
     </div>
 
-    <!-- KHU VỰC 1: DANH SÁCH NÚT BẤM CHỌN THIẾT BỊ ĐO ĐIỆN -->
     <div id="page-device-list" class="page">
         <div class="nav-header"> 
             <button class="btn-back" onclick="showPage('layer1')">← QUAY LẠI</button> 
@@ -85,7 +82,6 @@
         <div class="device-grid" id="device-container"></div>
     </div>
 
-    <!-- TRANG ĐIỆN NĂNG TIÊU THỤ TÍCH HỢP MÀN HÌNH ĐO PHA -->
     <div id="page-power-tong" class="page">
         <div class="nav-header"> 
             <button class="btn-back" onclick="showPage('page-device-list')">← DANH SÁCH THIẾT BỊ</button> 
@@ -128,7 +124,6 @@
                     <div class="meter-row" style="padding-bottom:2px;"><span class="meter-label">P.Tổng</span><span><span class="meter-val" id="val-ptot-page4" style="font-size:16px;">--</span><span class="meter-unit">kW</span></span></div>
                 </div>
 
-                <!-- Bổ sung màn hình 5 cho thiết bị 4 -->
                 <div id="m-screen-5" class="meter-screen">
                     <div style="font-weight:bold; text-align:center; border-bottom:1px solid #94a3b8; padding-bottom:4px;">THÔNG TIN BỔ SUNG</div>
                     <div class="meter-row"><span class="meter-label">Hiệu suất</span><span><span class="meter-val" id="val-hieu-suat">--</span><span class="meter-unit">%</span></span></div>
@@ -144,7 +139,6 @@
         </div>
     </div>
 
-    <!-- TRANG GIÁM SÁT NHIỆT ĐỘ -->
     <div id="page-temp-tong" class="page">
         <div class="nav-header"> <button class="btn-back" onclick="showPage('layer1')">← QUAY LẠI</button> <h2>NHIỆT ĐỘ HỆ THỐNG</h2> </div>
         <div style="background: var(--card-bg); padding: 50px; border-radius: 20px; text-align: center; border-top: 4px solid var(--accent);">
@@ -152,19 +146,16 @@
         </div>
     </div>
 
-    <!-- TRANG DANH SÁCH HỆ THỐNG CON -->
     <div id="page-sub-list" class="page">
         <div class="nav-header"> <button class="btn-back" onclick="showPage('layer1')">← QUAY LẠI</button> <h2>DANH SÁCH THIẾT BỊ</h2> </div>
         <div class="main-grid" id="sub-device-container"></div>
     </div>
 
-    <!-- GIAO DIỆN MÁY NÉN KHÍ JAGUAR -->
     <div id="page-jaguar-ui" class="page">
         <div class="nav-header"> <button class="btn-back" onclick="showPage('page-sub-list')">← DANH SÁCH</button> <h3 id="sub-device-title">JAGUAR CONTROL UNIT</h3> </div>
         <div class="jg-machine-frame">
             <div class="jg-top-bar"> <span>捷豹 JAGUAR</span> <span id="conn-status">📶 Online</span> </div>
             <div class="jg-content">
-                <!-- Màn hình chính -->
                 <div id="jg-home" class="jg-screen active">
                     <p style="text-align:center; font-weight:bold; margin-bottom:15px;">Intelligent Control System</p>
                     <div class="jg-data-grid">
@@ -175,7 +166,6 @@
                     </div>
                 </div>
 
-                <!-- Màn hình Menu ứng dụng -->
                 <div id="jg-menu" class="jg-screen">
                     <p style="text-align:center; font-weight:bold; border-bottom:1px solid #94a3b8; padding-bottom:5px;">Menu</p>
                     <div class="jg-app-grid">
@@ -187,7 +177,6 @@
                     </div>
                 </div>
                 
-                <!-- Màn hình Monitoring -->
                 <div id="jg-more" class="jg-screen">
                     <div style="font-weight:bold; border-bottom:1px solid #94a3b8; padding-bottom:5px; margin-bottom:5px;">Monitoring</div>
                     <div style="background:white; height:140px; width:100%; border:1px solid #666; margin-bottom:5px;">
@@ -204,7 +193,6 @@
                     </div>
                 </div>
 
-                <!-- Màn hình Maintenance -->
                 <div id="jg-maintenance" class="jg-screen">
                     <div style="display:flex; justify-content:space-between; border-bottom:1px solid #94a3b8; padding-bottom:5px; margin-bottom: 10px;"> <span style="font-weight:bold;">Maintenance</span> <button onclick="switchJaguar('jg-menu')" style="font-size:10px;">Back</button> </div>
                     <div id="maintenance-list" style="font-size: 10px; line-height: 1.4;">
@@ -216,7 +204,6 @@
                     </div>
                 </div>
 
-                <!-- Màn hình History Chart -->
                 <div id="jg-chart-page" class="jg-screen">
                     <div style="display:flex; justify-content:space-between; border-bottom:1px solid #94a3b8; padding-bottom:5px;"> <span style="font-weight:bold;">History Chart</span> <button onclick="switchJaguar('jg-more')" style="font-size:10px;">◀ Back</button> </div>
                     <div class="chart-controls" style="margin-top:10px;">
@@ -243,19 +230,24 @@
     </div>
 
     <script>
+        // Cấu hình kết nối Firebase 
         const firebaseConfig = { apiKey: "AIzaSyBWRpQCnDWV5YQpoXZ_o7aqfGdv_7yUT38", databaseURL: "https://wed-demo-d236a-default-rtdb.firebaseio.com", projectId: "wed-demo-d236a" };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
         
+        // Khai báo biến trạng thái chung cho các thiết bị điện và hệ thống con
         let currentMeterPage = 1;
         let totalMeterPages = 4;
         let currentActiveDevice = '1';
         let currentDeviceListener = null;
         let currentSubListener = null;
 
+        // Hàm chuyển đổi qua lại giữa các trang giao diện chính
         function showPage(id) { document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); document.getElementById(id).classList.add('active'); }
+        // Hàm chuyển đổi các màn hình con trong cụm hiển thị Jaguar
         function switchJaguar(id) { document.querySelectorAll('.jg-screen').forEach(s => s.classList.remove('active')); document.getElementById(id).classList.add('active'); }
 
+        // Danh sách các thiết bị đo điện (Sau này muốn thêm thiết bị điện mới, chỉ cần add thêm object vào mảng này)
         const meterDevices = [
             { id: '1', name: 'THIẾT BỊ 1' },
             { id: '2', name: 'THIẾT BỊ 2' },
@@ -264,6 +256,7 @@
             { id: '5', name: 'THIẾT BỊ 5' }
         ];
 
+        // Tự động render ra danh sách nút bấm thiết bị đo điện dựa vào mảng phía trên
         const deviceContainer = document.getElementById('device-container');
         deviceContainer.innerHTML = '';
         meterDevices.forEach(dev => {
@@ -274,8 +267,9 @@
             deviceContainer.appendChild(btnCard);
         });
 
+        // Hàm xử lý khi tôi click chọn một thiết bị đo điện cụ thể
         function openDevice(deviceId) {
-            // 1. Hủy lắng nghe thiết bị cũ
+            // Ngắt lắng nghe Firebase của thiết bị cũ trước khi chuyển sang thiết bị mới để tránh xung đột dữ liệu
             if (currentDeviceListener && currentActiveDevice) {
                 db.ref(`METER_${currentActiveDevice}`).off('value', currentDeviceListener);
             }
@@ -284,18 +278,17 @@
             document.getElementById('device-title').innerText = `THÔNG SỐ ĐIỆN - THIẾT BỊ ${deviceId}`;
             showPage('page-power-tong');
             
-            // 2. Thiết lập số trang chuẩn xác
+            // Tùy chỉnh riêng số lượng trang hiển thị (Ví dụ thiết bị số 4 có thêm trang 5)
             if (deviceId === '4') {
-                totalMeterPages = 5; // Thiết bị 4 có 5 trang
+                totalMeterPages = 5; 
             } else {
-                totalMeterPages = 4; // Các thiết bị khác chỉ có 4 trang
+                totalMeterPages = 4; 
                 if (currentMeterPage > 4) currentMeterPage = 1; 
             }
             
-            // Cập nhật lại giao diện ngay lập tức
             updateMeterScreenDisplay();
 
-            // 3. Lắng nghe dữ liệu Firebase
+            // Lắng nghe dữ liệu realtime từ nhánh Firebase tương ứng với ID thiết bị (METER_1, METER_2,...)
             currentDeviceListener = db.ref(`METER_${deviceId}`).on('value', (snap) => {
                 const d = snap.val();
                 if (!d) {
@@ -303,7 +296,7 @@
                     return;
                 }
                 
-                // Đổ dữ liệu các trang chung
+                // Đổ dữ liệu chung cho các trang
                 document.getElementById('val-vavg').innerText = d.v_avg || '--';
                 document.getElementById('val-aavg').innerText = d.a_avg || '--';
                 document.getElementById('val-ptot').innerText = d.congsuattucthoi || '--';
@@ -320,7 +313,7 @@
                 document.getElementById('val-pinst').innerText = d.congsuattucthoi || '--';
                 document.getElementById('val-ptot-page4').innerText = d.congsuattong || '--';
 
-                // Chỉ đổ dữ liệu trang 5 nếu là thiết bị 4
+                // Đổ dữ liệu riêng trang 5 nếu đúng là thiết bị 4
                 if (deviceId === '4') {
                     document.getElementById('val-hieu-suat').innerText = d.hieu_suat || '--';
                     document.getElementById('val-trang-thai').innerText = d.trang_thai || '--';
@@ -328,6 +321,7 @@
             });
         }
 
+        // Hàm xóa trắng giá trị trên màn hình thiết bị đo điện khi không có dữ liệu
         function clearMeterValues() {
             ['val-vavg', 'val-aavg', 'val-ptot', 'val-etot', 'val-va', 'val-vb', 'val-vc', 'val-ia', 'val-ib', 'val-ic', 'val-pa', 'val-pb', 'val-pc', 'val-pinst', 'val-ptot-page4', 'val-hieu-suat', 'val-trang-thai'].forEach(id => {
                 const el = document.getElementById(id);
@@ -335,23 +329,21 @@
             });
         }
 
-        // HÀM QUẢN LÝ HIỂN THỊ TỪNG TRANG (ĐÃ ĐƯỢC VIẾT LẠI AN TOÀN TUYỆT ĐỐI)
+        // Hàm quản lý hiển thị ẩn/hiện các trang của thiết bị đo điện
         function updateMeterScreenDisplay() {
-            // Duyệt qua tất cả các trang từ 1 đến 5 và ép ẩn hoàn toàn bằng style.display = 'none'
             for (let i = 1; i <= 5; i++) {
                 const screen = document.getElementById('m-screen-' + i);
                 if (screen) {
                     if (i === currentMeterPage) {
-                        screen.style.display = 'flex'; // Chỉ hiện đúng trang đang chọn
+                        screen.style.display = 'flex'; 
                         screen.classList.add('active');
                     } else {
-                        screen.style.display = 'none'; // Ẩn tất cả các trang còn lại
+                        screen.style.display = 'none'; 
                         screen.classList.remove('active');
                     }
                 }
             }
             
-            // Nếu không phải thiết bị 4 mà lỡ đứng ở trang 5 thì ẩn hẳn trang 5 đi
             if (currentActiveDevice !== '4') {
                 const screen5 = document.getElementById('m-screen-5');
                 if (screen5) screen5.style.display = 'none';
@@ -372,6 +364,7 @@
             updateMeterScreenDisplay();
         }
 
+        // Đồng hồ thời gian thực hiển thị ngày giờ góc trên màn hình thiết bị
         setInterval(() => {
             const now = new Date();
             const yyyy = now.getFullYear();
@@ -381,6 +374,7 @@
             document.getElementById('meter-time').innerText = `🕒 ${now.toTimeString().slice(0,8)}`;
         }, 1000);
 
+        // Khởi tạo biểu đồ cho máy nén khí Jaguar
         let activeMetric = 'temperature';
         let liveChart = new Chart(document.getElementById('liveChart').getContext('2d'), { 
             type: 'line', data: { labels: [], datasets: [{ label: 'Temp', data: [], borderColor: '#ef4444' }] }, options: { responsive: true, maintainAspectRatio: false } 
@@ -396,11 +390,13 @@
             liveChart.update();
         }
 
+        // Danh sách các hệ thống con (Sau này muốn thêm máy nén khí mới, chỉ cần add thêm object vào đây giống như phần thiết bị điện)
         const subSystems = [
             { id: 'JAGUAR_1', code: 'JAG-01', name: 'MÁY NÉN KHÍ JAGUAR 1' },
             { id: 'JAGUAR_2', code: 'JAG-02', name: 'MÁY NÉN KHÍ JAGUAR 2' }
         ];
 
+        // Tự động render danh sách hệ thống con ra màn hình
         const subContainer = document.getElementById('sub-device-container');
         subContainer.innerHTML = '';
         subSystems.forEach(sys => {
@@ -412,18 +408,29 @@
             subContainer.appendChild(card);
         });
 
+        // Hàm xử lý mở hệ thống con theo ID truyền vào từ Firebase (Giúp các máy hoạt động độc lập, không bị trùng dữ liệu)
         function openSubSystem(firebaseKey, sysName) {
-            document.getElementById('sub-device-title').innerText = sysName;
-            showPage('page-jaguar-ui');
-
+            // Hủy listener cũ của máy trước đó để tránh xung đột dữ liệu giữa các máy nén khí
             if (currentSubListener) {
                 db.ref(currentSubListener).off('value');
             }
             
             currentSubListener = firebaseKey;
+            document.getElementById('sub-device-title').innerText = sysName;
+            showPage('page-jaguar-ui');
+
+            // Xóa sạch dữ liệu biểu đồ cũ khi đổi sang máy khác
+            liveChart.data.labels = [];
+            liveChart.data.datasets[0].data = [];
+            liveChart.update();
+
+            // Lắng nghe dữ liệu Firebase đúng theo ID của từng thiết bị được chọn (JAGUAR_1 hoặc JAGUAR_2)
             db.ref(firebaseKey).on('value', (snap) => {
                 const d = snap.val();
-                if (!d) return;
+                if (!d) {
+                    clearJaguarValues();
+                    return;
+                }
                 
                 document.getElementById('val-temp-data').innerText = d.temperature || '--';
                 document.getElementById('jg-p-val').innerText = d.pressure || '--';
@@ -442,18 +449,23 @@
                 liveChart.data.datasets[0].data.push(d[activeMetric] || 0);
                 const colors = { temperature: '#ef4444', pressure: '#3b82f6', voltage: '#eab308', frequency: '#22c55e' };
                 liveChart.data.datasets[0].borderColor = colors[activeMetric];
-                if (liveChart.data.labels.length > 10) { liveChart.data.labels.shift(); liveChart.data.datasets[0].data.shift(); }
+                if (liveChart.data.labels.length > 10) { 
+                    liveChart.data.labels.shift(); 
+                    liveChart.data.datasets[0].data.shift(); 
+                }
                 liveChart.update();
             });
         }
 
-        db.ref('JAGUAR_1').on('value', (snap) => {
-            const d = snap.val();
-            if (d && d.temperature) {
-                document.getElementById('val-temp-data').innerText = d.temperature;
-            }
-        });
+        // Hàm làm trống các giá trị của máy nén khí khi mất dữ liệu
+        function clearJaguarValues() {
+            ['val-temp-data', 'jg-p-val', 'jg-t-val', 'jg-v-val', 'jg-f-val', 'maint-air-used', 'maint-oil-used', 'maint-sep-used', 'maint-lub-used', 'maint-grease-used'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.innerText = '--';
+            });
+        }
 
+        // Theo dõi trạng thái kết nối mạng của hệ thống với Firebase
         db.ref(".info/connected").on("value", (snap) => { document.getElementById('conn-status').innerText = snap.val() ? "📶 Online" : "❌ Offline"; });
     </script>
 </body>
