@@ -297,36 +297,39 @@
             updateMeterScreenDisplay();
 
             // Lắng nghe dữ liệu realtime từ nhánh Firebase tương ứng với ID thiết bị (METER_1, METER_2,...)
-            currentDeviceListener = db.ref(`METER_${deviceId}`).on('value', (snap) => {
-                const d = snap.val();
-                if (!d) {
-                    clearMeterValues();
-                    return;
-                }
-                
-                // Đổ dữ liệu chung cho các trang
-                document.getElementById('val-vavg').innerText = d.v_avg || '--';
-                document.getElementById('val-aavg').innerText = d.a_avg || '--';
-                document.getElementById('val-ptot').innerText = d.congsuattucthoi || '--';
-                document.getElementById('val-etot').innerText = d.congsuattong || '--';
-                document.getElementById('val-va').innerText = d.pha_a || '--';
-                document.getElementById('val-vb').innerText = d.pha_b || '--';
-                document.getElementById('val-vc').innerText = d.pha_c || '--';
-                document.getElementById('val-ia').innerText = d.dong_a || '--';
-                document.getElementById('val-ib').innerText = d.dong_b || '--';
-                document.getElementById('val-ic').innerText = d.dong_c || '--';
-                document.getElementById('val-pa').innerText = d.congsuat_a || '--';
-                document.getElementById('val-pb').innerText = d.congsuat_b || '--';
-                document.getElementById('val-pc').innerText = d.congsuat_c || '--';
-                document.getElementById('val-pinst').innerText = d.congsuattucthoi || '--';
-                document.getElementById('val-ptot-page4').innerText = d.congsuattong || '--';
+currentDeviceListener = db.ref(`METER_${deviceId}`).on('value', (snap) => {
+    const d = snap.val();
+    if (!d) {
+        clearMeterValues();
+        return;
+    }
+    
+          // Hàm trợ giúp để hiển thị đúng số 0 thay vì --
+    const formatVal = (val) => (val !== undefined && val !== null && val !== '') ? val : '--';
 
-                // Đổ dữ liệu riêng trang 5 nếu đúng là thiết bị 4
-                if (deviceId === '4') {
-                    document.getElementById('val-hieu-suat').innerText = d.hieu_suat || '--';
-                    document.getElementById('val-trang-thai').innerText = d.trang_thai || '--';
-                }
-            });
+          // Đổ dữ liệu chung cho các trang
+          document.getElementById('val-vavg').innerText = formatVal(d.v_avg);
+          document.getElementById('val-aavg').innerText = formatVal(d.a_avg);
+          document.getElementById('val-ptot').innerText = formatVal(d.congsuattucthoi);
+          document.getElementById('val-etot').innerText = formatVal(d.congsuattong);
+          document.getElementById('val-va').innerText = formatVal(d.pha_a);
+          document.getElementById('val-vb').innerText = formatVal(d.pha_b);
+          document.getElementById('val-vc').innerText = formatVal(d.pha_c);
+          document.getElementById('val-ia').innerText = formatVal(d.dong_a);
+          document.getElementById('val-ib').innerText = formatVal(d.dong_b);
+          document.getElementById('val-ic').innerText = formatVal(d.dong_c);
+          document.getElementById('val-pa').innerText = formatVal(d.congsuat_a);
+          document.getElementById('val-pb').innerText = formatVal(d.congsuat_b);
+          document.getElementById('val-pc').innerText = formatVal(d.congsuat_c);
+          document.getElementById('val-pinst').innerText = formatVal(d.congsuattucthoi);
+          document.getElementById('val-ptot-page4').innerText = formatVal(d.congsuattong);
+
+    // Đổ dữ liệu riêng trang 5 nếu đúng là thiết bị 4
+    if (deviceId === '4') {
+        document.getElementById('val-hieu-suat').innerText = formatVal(d.hieu_suat);
+        document.getElementById('val-trang-thai').innerText = formatVal(d.trang_thai);
+    }
+  });
         }
 
         // Hàm xóa trắng giá trị trên màn hình thiết bị đo điện khi không có dữ liệu
