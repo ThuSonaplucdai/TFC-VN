@@ -67,17 +67,7 @@
         .tool-btn:hover { background: #0369a1; }
         .tool-btn.active-mode { background: #16a34a; }
 
-        .bg-input {
-            background: #0f172a;
-            border: 1px solid var(--border-col);
-            color: white;
-            padding: 5px 8px;
-            border-radius: 4px;
-            font-size: 11px;
-            width: 180px;
-        }
-
-        /* --- SƠ ĐỒ MẶT BẰNG TỔNG THỂ DUY NHẤT --- */
+        /* --- SƠ ĐỒ MẶT BẰNG TỔNG THỂ DUY NHẤT (CỐ ĐỊNH ẢNH NỀN) --- */
         .scada-floorplan-container {
             width: 100%;
             max-width: 1750px;
@@ -93,7 +83,8 @@
             box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
             overflow: hidden;
             
-            background-image: url('mat_bang.jpg');
+            /* Đổi tên file 'mat_bang.png' thành tên file ảnh thực tế của bạn nếu cần */
+            background-image: url('mat_bang.png');
             background-position: center;
             background-repeat: no-repeat;
             background-size: contain;
@@ -287,15 +278,11 @@
         <h1 style="margin: 0; font-size: 16px;">🏭 HỆ THỐNG SCADA - SƠ ĐỒ TỔNG THỂ NHÀ XƯỞNG</h1>
         <div class="header-controls">
             <button id="btn-toggle-coord" class="tool-btn" onclick="toggleCoordinateMode()">📐 Bật Tọa Độ: TẮT</button>
-            <div style="display: flex; align-items: center; gap: 5px;">
-                <input type="text" id="bg-url-input" class="bg-input" value="ChatGPT_Layout" placeholder="Đường dẫn ảnh nền...">
-                <button class="tool-btn" onclick="changeBackgroundImage()">Đổi Ảnh</button>
-            </div>
             <span id="global-conn" style="font-size: 11px;">📶 Đang kết nối...</span>
         </div>
     </div>
 
-    <!-- KHUNG MẶT BẰNG TỔNG THỂ DUY NHẤT -->
+    <!-- KHUNG MẶT BẰNG TỔNG THỂ DUY NHẤT (ẢNH CỐ ĐỊNH) -->
     <div class="scada-floorplan-container">
         <div class="factory-layout-box" id="layout-box-main">
             <div class="layout-title">📍 SƠ ĐỒ MẶT BẰNG TỔNG THỂ</div>
@@ -619,13 +606,6 @@
                 btn.innerText = "📐 Bật Tọa Độ: TẮT";
                 btn.classList.remove('active-mode');
                 box.classList.remove('coordinate-mode');
-            }
-        }
-
-        function changeBackgroundImage() {
-            const url = document.getElementById('bg-url-input').value.trim();
-            if(url) {
-                document.getElementById('layout-box-main').style.backgroundImage = `url('${url}')`;
             }
         }
 
