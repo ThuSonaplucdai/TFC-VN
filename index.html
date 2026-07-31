@@ -91,16 +91,17 @@
             border: 1px solid var(--border-col);
             border-radius: 5px;
             padding: 6px 8px;
-            cursor: pointer;
+            cursor: grab;
             width: 165px;
-            transition: all 0.2s;
+            transition: border-color 0.2s, box-shadow 0.2s;
             box-shadow: 0 4px 6px rgba(0,0,0,0.4);
             z-index: 10;
         }
 
+        .scada-node:active { cursor: grabbing; }
+
         .scada-node:hover {
             border-color: var(--accent);
-            transform: scale(1.05);
             box-shadow: 0 0 12px rgba(56, 189, 248, 0.4);
             z-index: 100;
         }
@@ -234,68 +235,68 @@
 
     <!-- Header SCADA -->
     <div class="scada-header">
-        <h1 style="margin: 0; font-size: 15px;">🏭 HỆ THỐNG SCADA - DÙNG CHUNG ẢNH NỀN MẶT BẰNG</h1>
+        <h1 style="margin: 0; font-size: 15px;">🏭 HỆ THỐNG SCADA - CĂN CHỈNH TỌA ĐỘ MẶT BẰNG</h1>
         <span id="global-conn" style="font-size: 11px;">📶 Đang kết nối...</span>
     </div>
 
-    <!-- KHUNG CHỨA 2 MẶT BẰNG DÙNG CHUNG mat_bang.jpg -->
+    <!-- KHUNG CHỨA 2 MẶT BẰNG -->
     <div class="scada-floorplan-container">
 
         <!-- ================= MẶT BẰNG XƯỞNG 01 ================= -->
         <div class="factory-layout-box">
             <div class="layout-title">📍 MẶT BẰNG XƯỞNG 01</div>
 
-            <div class="scada-node" style="top: 80px; left: 320px;" onclick="openMeterDevice('13')">
+            <div class="scada-node" style="top: 80px; left: 320px;" data-id="METER_13">
                 <div class="node-title"><span>⚡ METER 13</span><div class="node-status"></div></div>
-                <div class="node-body">
+                <div class="node-body" onclick="openMeterDevice('13')">
                     <div class="node-row"><span>Vavg:</span><span class="node-val" id="map-v-13">-- V</span></div>
                     <div class="node-row"><span>Ptot:</span><span class="node-val" id="map-p-13">-- kW</span></div>
                 </div>
             </div>
 
-            <div class="scada-node" style="top: 180px; left: 450px;" onclick="openMeterDevice('2')">
+            <div class="scada-node" style="top: 180px; left: 450px;" data-id="METER_2">
                 <div class="node-title"><span>⚡ METER 2</span><div class="node-status"></div></div>
-                <div class="node-body">
+                <div class="node-body" onclick="openMeterDevice('2')">
                     <div class="node-row"><span>Vavg:</span><span class="node-val" id="map-v-2">-- V</span></div>
                     <div class="node-row"><span>Ptot:</span><span class="node-val" id="map-p-2">-- kW</span></div>
                 </div>
             </div>
 
-            <div class="scada-node" style="top: 260px; left: 240px;" onclick="openMeterDevice('15')">
+            <div class="scada-node" style="top: 260px; left: 240px;" data-id="METER_15">
                 <div class="node-title"><span>⚡ METER 15</span><div class="node-status"></div></div>
-                <div class="node-body">
+                <div class="node-body" onclick="openMeterDevice('15')">
                     <div class="node-row"><span>Vavg:</span><span class="node-val" id="map-v-15">-- V</span></div>
                     <div class="node-row"><span>Ptot:</span><span class="node-val" id="map-p-15">-- kW</span></div>
                 </div>
             </div>
 
-            <div class="scada-node" style="top: 100px; left: 580px;" onclick="openSubSysDevice('JAGUAR_4', 'MÁY NÉN KHÍ JAG-04')">
+            <div class="scada-node" style="top: 100px; left: 580px;" data-id="JAGUAR_4">
                 <div class="node-title"><span>🐆 JAGUAR 4</span><div class="node-status"></div></div>
-                <div class="node-body">
+                <div class="node-body" onclick="openSubSysDevice('JAGUAR_4', 'MÁY NÉN KHÍ JAG-04')">
                     <div class="node-row"><span>Áp suất:</span><span class="node-val" id="map-jag4-p">-- MPa</span></div>
                     <div class="node-row"><span>Nhiệt độ:</span><span class="node-val" id="map-jag4-t">-- °C</span></div>
                 </div>
             </div>
 
-            <div class="scada-node" style="top: 320px; left: 620px;" onclick="openSubSysDevice('JAGUAR_3', 'MÁY NÉN KHÍ JAG-03')">
+            <div class="scada-node" style="top: 320px; left: 620px;" data-id="JAGUAR_3">
                 <div class="node-title"><span>🐆 JAGUAR 3</span><div class="node-status"></div></div>
-                <div class="node-body">
+                <div class="node-body" onclick="openSubSysDevice('JAGUAR_3', 'MÁY NÉN KHÍ JAG-03')">
                     <div class="node-row"><span>Áp suất:</span><span class="node-val" id="map-jag3-p">-- MPa</span></div>
                     <div class="node-row"><span>Nhiệt độ:</span><span class="node-val" id="map-jag3-t">-- °C</span></div>
                 </div>
             </div>
 
-            <div class="scada-node" style="top: 480px; left: 500px;" onclick="openSubSysDevice('JAGUAR_2', 'MÁY NÉN KHÍ JAG-02')">
+            <div class="scada-node" style="top: 480px; left: 500px;" data-id="JAGUAR_2">
                 <div class="node-title"><span>🐆 JAGUAR 2</span><div class="node-status"></div></div>
-                <div class="node-body">
+                <div class="node-body" onclick="openSubSysDevice('JAGUAR_2', 'MÁY NÉN KHÍ JAG-02')">
                     <div class="node-row"><span>Áp suất:</span><span class="node-val" id="map-jag2-p">-- MPa</span></div>
                     <div class="node-row"><span>Nhiệt độ:</span><span class="node-val" id="map-jag2-t">-- °C</span></div>
                 </div>
             </div>
 
-            <div class="scada-node" style="top: 640px; left: 360px;" onclick="openSubSysDevice('JAGUAR_1', 'MÁY NÉN KHÍ JAG-01')">
+            <div class="scada-node" style="top: 640px; left: 360px;" data-id="JAGUAR_1">
                 <div class="node-title"><span>🐆 JAGUAR 1</span><div class="node-status"></div></div>
-                <div class="node-body">
+                <div class="node-body" onclick="openSubSysDevice('JAGUAR_1', 'MÁY NÉN KHÍ JAG-01')">
                     <div class="node-row"><span>Áp suất:</span><span class="node-val" id="map-jag1-p">-- MPa</span></div>
                     <div class="node-row"><span>Nhiệt độ:</span><span class="node-val" id="map-jag1-t">-- °C</span></div>
                 </div>
@@ -306,41 +307,41 @@
         <div class="factory-layout-box">
             <div class="layout-title">📍 MẶT BẰNG XƯỞNG 02</div>
 
-            <div class="scada-node" style="top: 80px; left: 320px;" onclick="openMeterDevice('14')">
+            <div class="scada-node" style="top: 80px; left: 320px;" data-id="METER_14">
                 <div class="node-title"><span>⚡ METER 14</span><div class="node-status"></div></div>
-                <div class="node-body">
+                <div class="node-body" onclick="openMeterDevice('14')">
                     <div class="node-row"><span>Vavg:</span><span class="node-val" id="map-v-14">-- V</span></div>
                     <div class="node-row"><span>Ptot:</span><span class="node-val" id="map-p-14">-- kW</span></div>
                 </div>
             </div>
 
-            <div class="scada-node" style="top: 200px; left: 200px;" onclick="openMeterDevice('18')">
+            <div class="scada-node" style="top: 200px; left: 200px;" data-id="METER_18">
                 <div class="node-title"><span>⚡ METER 18</span><div class="node-status"></div></div>
-                <div class="node-body">
+                <div class="node-body" onclick="openMeterDevice('18')">
                     <div class="node-row"><span>Vavg:</span><span class="node-val" id="map-v-18">-- V</span></div>
                     <div class="node-row"><span>Ptot:</span><span class="node-val" id="map-p-18">-- kW</span></div>
                 </div>
             </div>
 
-            <div class="scada-node" style="top: 200px; left: 480px;" onclick="openMeterDevice('19')">
+            <div class="scada-node" style="top: 200px; left: 480px;" data-id="METER_19">
                 <div class="node-title"><span>⚡ METER 19</span><div class="node-status"></div></div>
-                <div class="node-body">
+                <div class="node-body" onclick="openMeterDevice('19')">
                     <div class="node-row"><span>Vavg:</span><span class="node-val" id="map-v-19">-- V</span></div>
                     <div class="node-row"><span>Ptot:</span><span class="node-val" id="map-p-19">-- kW</span></div>
                 </div>
             </div>
 
-            <div class="scada-node" style="top: 380px; left: 380px;" onclick="openMeterDevice('20')">
+            <div class="scada-node" style="top: 380px; left: 380px;" data-id="METER_20">
                 <div class="node-title"><span>⚡ METER 20</span><div class="node-status"></div></div>
-                <div class="node-body">
+                <div class="node-body" onclick="openMeterDevice('20')">
                     <div class="node-row"><span>Vavg:</span><span class="node-val" id="map-v-20">-- V</span></div>
                     <div class="node-row"><span>Ptot:</span><span class="node-val" id="map-p-20">-- kW</span></div>
                 </div>
             </div>
 
-            <div class="scada-node" style="top: 340px; left: 100px;" onclick="openMeterDevice('21')">
+            <div class="scada-node" style="top: 340px; left: 100px;" data-id="METER_21">
                 <div class="node-title"><span>⚡ METER 21</span><div class="node-status"></div></div>
-                <div class="node-body">
+                <div class="node-body" onclick="openMeterDevice('21')">
                     <div class="node-row"><span>Vavg:</span><span class="node-val" id="map-v-21">-- V</span></div>
                     <div class="node-row"><span>Ptot:</span><span class="node-val" id="map-p-21">-- kW</span></div>
                 </div>
@@ -468,6 +469,36 @@
             document.removeEventListener('mousemove', onDragging);
             document.removeEventListener('mouseup', stopDragging);
         }
+
+        // === TÍNH NĂNG KÉO THẢ THIẾT BỊ ĐỂ DÒ VỊ TRÍ (TEST MODE) ===
+        document.querySelectorAll('.scada-node').forEach(node => {
+            let isDraggingNode = false;
+            let dStartX, dStartY;
+
+            node.addEventListener('mousedown', (e) => {
+                isDraggingNode = true;
+                dStartX = e.clientX - node.offsetLeft;
+                dStartY = e.clientY - node.offsetTop;
+                node.style.zIndex = 10000;
+                e.stopPropagation();
+            });
+
+            document.addEventListener('mousemove', (e) => {
+                if (!isDraggingNode) return;
+                let newX = e.clientX - dStartX;
+                let newY = e.clientY - dStartY;
+                node.style.left = newX + 'px';
+                node.style.top = newY + 'px';
+                
+                // In tọa độ trực tiếp ra Console (Nhấn F12 để xem)
+                const nameId = node.getAttribute('data-id');
+                console.log(`[${nameId}] -> top: ${newY}px, left: ${newX}px`);
+            });
+
+            document.addEventListener('mouseup', () => {
+                isDraggingNode = false;
+            });
+        });
 
         const meterIds = ['2', '3', '13', '14', '15', '18', '19', '20', '21'];
         meterIds.forEach(id => {
