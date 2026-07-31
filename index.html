@@ -92,6 +92,10 @@
             background-size: contain;
         }
 
+        .factory-layout-box.coordinate-mode {
+            cursor: crosshair; /* Đổi con trỏ thành dấu cộng khi bật lấy tọa độ */
+        }
+
         .layout-title {
             position: absolute;
             top: 15px;
@@ -104,6 +108,22 @@
             color: var(--accent);
             border-radius: 4px;
             z-index: 50;
+        }
+
+        /* --- BẢNG HIỂN THỊ TỌA ĐỘ KHI CLICK --- */
+        #coord-popup-box {
+            position: absolute;
+            background: rgba(15, 23, 42, 0.95);
+            border: 2px solid #eab308;
+            color: #f8fafc;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-family: monospace;
+            z-index: 9999;
+            display: none;
+            box-shadow: 0 10px 15px rgba(0,0,0,0.5);
+            pointer-events: none;
         }
 
         /* --- THẺ THIẾT BỊ DÙNG TỌA ĐỘ PIXEL (PX) CHUẨN XÁC TUYỆT ĐỐI --- */
@@ -119,12 +139,6 @@
             box-shadow: 0 4px 6px rgba(0,0,0,0.4);
             z-index: 10;
         }
-
-        .factory-layout-box.coordinate-mode .scada-node {
-            cursor: grab;
-            border-color: #eab308;
-        }
-        .factory-layout-box.coordinate-mode .scada-node:active { cursor: grabbing; }
 
         .scada-node:hover {
             border-color: var(--accent);
@@ -280,17 +294,20 @@
     <div class="scada-header">
         <h1 style="margin: 0; font-size: 15px;">🏭 HỆ THỐNG SCADA - SƠ ĐỒ TỔNG THỂ</h1>
         <div class="header-controls">
-            <button id="btn-toggle-coord" class="tool-btn" onclick="toggleCoordinateMode()">📐 Bật Tọa Độ: TẮT</button>
+            <button id="btn-toggle-coord" class="tool-btn" onclick="toggleCoordinateMode()">📍 Xem Tọa Độ Click: TẮT</button>
             <span id="global-conn" style="font-size: 11px;">📶 Đang kết nối...</span>
         </div>
     </div>
 
-    <!-- KHUNG MẶT BẰNG TỔNG THỂ (CÓ THANH CUỘN NGANG KHI XEM TRÊN ĐIỆN THOẠI) -->
+    <!-- KHUNG MẶT BẰNG TỔNG THỂ -->
     <div class="scada-floorplan-container">
-        <div class="factory-layout-box" id="layout-box-main">
+        <div class="factory-layout-box" id="layout-box-main" onclick="getClickCoordinate(event)">
             <div class="layout-title">📍 SƠ ĐỒ MẶT BẰNG TỔNG THỂ</div>
+            
+            <!-- Bảng hiển thị tọa độ khi click -->
+            <div id="coord-popup-box"></div>
 
-            <!-- Các nút thiết bị Đo Điện (Meters) - Giữ nguyên vị trí tuyệt đối (px) chuẩn máy tính -->
+            <!-- Các nút thiết bị Đo Điện (Meters) -->
             <div class="scada-node" style="top: 80px; left: 80px;" data-id="METER_2">
                 <div class="node-title"><span>⚡ METER 2</span><div class="node-status"></div></div>
                 <div class="node-body" onclick="openMeterDevice('2')">
@@ -595,49 +612,47 @@
             document.removeEventListener('mouseup', stopDragging);
         }
 
+        // Bật/Tắt tính năng Click lấy tọa độ
         function toggleCoordinateMode() {
             isCoordinateMode = !isCoordinateMode;
             const btn = document.getElementById('btn-toggle-coord');
             const box = document.getElementById('layout-box-main');
+            const popup = document.getElementById('coord-popup-box');
             
             if(isCoordinateMode) {
-                btn.innerText = "📐 Bật Tọa Độ: BẬT";
+                btn.innerText = "📍 Xem Tọa Độ Click: BẬT";
                 btn.classList.add('active-mode');
                 box.classList.add('coordinate-mode');
             } else {
-                btn.innerText = "📐 Bật Tọa Độ: TẮT";
+                btn.innerText = "📍 Xem Tọa Độ Click: TẮT";
                 btn.classList.remove('active-mode');
                 box.classList.remove('coordinate-mode');
+                popup.style.display = 'none';
             }
         }
 
-        document.querySelectorAll('.scada-node').forEach(node => {
-            let isDraggingNode = false;
-            let dStartX, dStartY;
+        // Hàm bắt sự kiện nhấn vào màn hình để lấy tọa độ chuẩn xác
+        function getClickCoordinate(e) {
+            if (!isCoordinateMode) return;
+            
+            // Nếu bấm nhầm vào thẻ thiết bị thì bỏ qua để không bị xung đột
+            if (e.target.closest('.scada-node')) return;
 
-            node.addEventListener('mousedown', (e) => {
-                if(!isCoordinateMode) return;
-                isDraggingNode = true;
-                dStartX = e.clientX - node.offsetLeft;
-                dStartY = e.clientY - node.offsetTop;
-                node.style.zIndex = 10000;
-                e.stopPropagation();
-            });
+            const box = document.getElementById('layout-box-main');
+            const rect = box.getBoundingClientRect();
+            
+            // Tính toán tọa độ X (left) và Y (top) bên trong khung mặt bằng
+            let x = Math.round(e.clientX - rect.left);
+            let y = Math.round(e.clientY - rect.top);
 
-            document.addEventListener('mousemove', (e) => {
-                if (!isDraggingNode || !isCoordinateMode) return;
-                let boxRect = document.getElementById('layout-box-main').getBoundingClientRect();
-                let newX = e.clientX - boxRect.left - dStartX;
-                let newY = e.clientY - boxRect.top - dStartY;
-                node.style.left = newX + 'px';
-                node.style.top = newY + 'px';
-                console.log(`[${node.getAttribute('data-id')}] -> top: ${Math.round(newY)}px, left: ${Math.round(newX)}px`);
-            });
+            const popup = document.getElementById('coord-popup-box');
+            popup.innerHTML = `📍 Tọa độ:<br><b>top: ${y}px;</b><br><b>left: ${x}px;</b>`;
+            popup.style.left = (x + 10) + 'px';
+            popup.style.top = (y + 10) + 'px';
+            popup.style.display = 'block';
 
-            document.addEventListener('mouseup', () => {
-                isDraggingNode = false;
-            });
-        });
+            console.log(`Đã nhấn vào -> top: ${y}px, left: ${x}px`);
+        }
 
         const meterIds = ['2', '10', '13', '14', '15', '18', '19', '20', '21'];
         meterIds.forEach(id => {
