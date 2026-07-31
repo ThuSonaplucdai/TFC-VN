@@ -38,7 +38,7 @@
             justify-content: space-between; 
             margin-bottom: 10px; 
             width: 100%; 
-            max-width: 1750px;
+            max-width: 1450px;
             background: var(--panel-bg);
             padding: 10px 20px;
             border-radius: 6px;
@@ -67,22 +67,23 @@
         .tool-btn:hover { background: #0369a1; }
         .tool-btn.active-mode { background: #16a34a; }
 
-        /* --- SƠ ĐỒ MẶT BẰNG TỔNG THỂ (RESPONSIVE CHUẨN TRÊN MỌI THIẾT BỊ) --- */
+        /* --- SƠ ĐỒ MẶT BẰNG TỔNG THỂ (CỐ ĐỊNH KÍCH THƯỚC NGANG ĐỂ GIỐNG MÁY TÍNH) --- */
         .scada-floorplan-container {
             width: 100%;
-            max-width: 1750px;
+            max-width: 1450px;
+            overflow-x: auto; /* Cho phép lướt xem trên điện thoại màn hình dọc */
+            overflow-y: hidden;
+            border-radius: 8px;
+            border: 2px solid var(--border-col);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+            background-color: #0f172a;
         }
 
         .factory-layout-box {
             position: relative;
-            width: 100%;
-            /* Sử dụng aspect-ratio để khung tự co giãn chiều cao theo tỷ lệ chuẩn của ảnh (Ví dụ tỷ lệ ngang/dọc ~ 16:9 hoặc chỉnh theo ảnh thực tế của bạn) */
-            aspect-ratio: 16 / 9;
-            min-height: 450px;
+            width: 1400px; /* Cố định chiều rộng chuẩn máy tính */
+            height: 800px; /* Cố định chiều cao chuẩn máy tính */
             background-color: #0f172a;
-            border-radius: 8px;
-            border: 2px solid var(--border-col);
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
             overflow: hidden;
             
             background-image: url('mat_bang.png');
@@ -105,16 +106,15 @@
             z-index: 50;
         }
 
-        /* --- THẺ THIẾT BỊ DÙNG TỌA ĐỘ PHẦN TRĂM (%) ĐỂ KHÔNG BAO GIỜ LỆCH KHI ĐỔI THIẾT BỊ --- */
+        /* --- THẺ THIẾT BỊ DÙNG TỌA ĐỘ PIXEL (PX) CHUẨN XÁC TUYỆT ĐỐI --- */
         .scada-node {
             position: absolute;
             background: var(--tag-bg);
             border: 1px solid var(--border-col);
             border-radius: 5px;
-            padding: 5px 6px;
+            padding: 6px 8px;
             cursor: default;
-            width: 15.5%; /* Co giãn theo khung */
-            min-width: 130px;
+            width: 180px; /* Cố định kích thước thẻ */
             transition: border-color 0.2s, box-shadow 0.2s;
             box-shadow: 0 4px 6px rgba(0,0,0,0.4);
             z-index: 10;
@@ -133,15 +133,15 @@
         }
 
         .node-title {
-            font-size: 10px;
+            font-size: 11px;
             font-weight: bold;
             color: var(--accent);
             display: flex;
             justify-content: space-between;
             align-items: center;
             border-bottom: 1px solid #334155;
-            padding-bottom: 2px;
-            margin-bottom: 3px;
+            padding-bottom: 3px;
+            margin-bottom: 4px;
         }
 
         .node-status {
@@ -155,8 +155,8 @@
         .node-body {
             display: flex;
             flex-direction: column;
-            gap: 1px;
-            font-size: 10px;
+            gap: 2px;
+            font-size: 11px;
             font-family: monospace;
             cursor: pointer;
         }
@@ -285,13 +285,13 @@
         </div>
     </div>
 
-    <!-- KHUNG MẶT BẰNG TỔNG THỂ DUY NHẤT -->
+    <!-- KHUNG MẶT BẰNG TỔNG THỂ (CÓ THANH CUỘN NGANG KHI XEM TRÊN ĐIỆN THOẠI) -->
     <div class="scada-floorplan-container">
         <div class="factory-layout-box" id="layout-box-main">
-            <div class="layout-title">📍 SƠ ĐỒ MẶT BẰNG</div>
+            <div class="layout-title">📍 SƠ ĐỒ MẶT BẰNG TỔNG THỂ</div>
 
-            <!-- Các nút thiết bị Đo Điện (Meters) - Dùng % để chuẩn trên cả mobile -->
-            <div class="scada-node" style="top: 8%; left: 5%;" data-id="METER_2">
+            <!-- Các nút thiết bị Đo Điện (Meters) - Giữ nguyên vị trí tuyệt đối (px) chuẩn máy tính -->
+            <div class="scada-node" style="top: 80px; left: 80px;" data-id="METER_2">
                 <div class="node-title"><span>⚡ METER 2</span><div class="node-status"></div></div>
                 <div class="node-body" onclick="openMeterDevice('2')">
                     <div class="node-row"><span>Vavg:</span><span class="node-val" id="map-v-2">-- V</span></div>
@@ -299,7 +299,7 @@
                 </div>
             </div>
 
-            <div class="scada-node" style="top: 8%; left: 23%;" data-id="METER_10">
+            <div class="scada-node" style="top: 80px; left: 290px;" data-id="METER_10">
                 <div class="node-title"><span>⚡ METER 10</span><div class="node-status"></div></div>
                 <div class="node-body" onclick="openMeterDevice('10')">
                     <div class="node-row"><span>Vavg:</span><span class="node-val" id="map-v-10">-- V</span></div>
@@ -307,7 +307,7 @@
                 </div>
             </div>
 
-            <div class="scada-node" style="top: 8%; left: 41%;" data-id="METER_13">
+            <div class="scada-node" style="top: 80px; left: 500px;" data-id="METER_13">
                 <div class="node-title"><span>⚡ METER 13</span><div class="node-status"></div></div>
                 <div class="node-body" onclick="openMeterDevice('13')">
                     <div class="node-row"><span>Vavg:</span><span class="node-val" id="map-v-13">-- V</span></div>
@@ -315,7 +315,7 @@
                 </div>
             </div>
 
-            <div class="scada-node" style="top: 27%; left: 5%;" data-id="METER_14">
+            <div class="scada-node" style="top: 240px; left: 80px;" data-id="METER_14">
                 <div class="node-title"><span>⚡ METER 14</span><div class="node-status"></div></div>
                 <div class="node-body" onclick="openMeterDevice('14')">
                     <div class="node-row"><span>Vavg:</span><span class="node-val" id="map-v-14">-- V</span></div>
@@ -323,7 +323,7 @@
                 </div>
             </div>
 
-            <div class="scada-node" style="top: 27%; left: 23%;" data-id="METER_15">
+            <div class="scada-node" style="top: 240px; left: 290px;" data-id="METER_15">
                 <div class="node-title"><span>⚡ METER 15</span><div class="node-status"></div></div>
                 <div class="node-body" onclick="openMeterDevice('15')">
                     <div class="node-row"><span>Vavg:</span><span class="node-val" id="map-v-15">-- V</span></div>
@@ -331,7 +331,7 @@
                 </div>
             </div>
 
-            <div class="scada-node" style="top: 27%; left: 41%;" data-id="METER_18">
+            <div class="scada-node" style="top: 240px; left: 500px;" data-id="METER_18">
                 <div class="node-title"><span>⚡ METER 18</span><div class="node-status"></div></div>
                 <div class="node-body" onclick="openMeterDevice('18')">
                     <div class="node-row"><span>Vavg:</span><span class="node-val" id="map-v-18">-- V</span></div>
@@ -339,7 +339,7 @@
                 </div>
             </div>
 
-            <div class="scada-node" style="top: 46%; left: 5%;" data-id="METER_19">
+            <div class="scada-node" style="top: 400px; left: 80px;" data-id="METER_19">
                 <div class="node-title"><span>⚡ METER 19</span><div class="node-status"></div></div>
                 <div class="node-body" onclick="openMeterDevice('19')">
                     <div class="node-row"><span>Vavg:</span><span class="node-val" id="map-v-19">-- V</span></div>
@@ -347,7 +347,7 @@
                 </div>
             </div>
 
-            <div class="scada-node" style="top: 46%; left: 23%;" data-id="METER_20">
+            <div class="scada-node" style="top: 400px; left: 290px;" data-id="METER_20">
                 <div class="node-title"><span>⚡ METER 20</span><div class="node-status"></div></div>
                 <div class="node-body" onclick="openMeterDevice('20')">
                     <div class="node-row"><span>Vavg:</span><span class="node-val" id="map-v-20">-- V</span></div>
@@ -355,7 +355,7 @@
                 </div>
             </div>
 
-            <div class="scada-node" style="top: 46%; left: 41%;" data-id="METER_21">
+            <div class="scada-node" style="top: 400px; left: 500px;" data-id="METER_21">
                 <div class="node-title"><span>⚡ METER 21</span><div class="node-status"></div></div>
                 <div class="node-body" onclick="openMeterDevice('21')">
                     <div class="node-row"><span>Vavg:</span><span class="node-val" id="map-v-21">-- V</span></div>
@@ -364,7 +364,7 @@
             </div>
 
             <!-- Các nút Máy Nén Khí Jaguar -->
-            <div class="scada-node" style="top: 67%; left: 5%;" data-id="JAGUAR_1">
+            <div class="scada-node" style="top: 600px; left: 80px;" data-id="JAGUAR_1">
                 <div class="node-title"><span>🐆 JAGUAR 1</span><div class="node-status"></div></div>
                 <div class="node-body" onclick="openSubSysDevice('JAGUAR_1', 'MÁY NÉN KHÍ JAGUAR 1')">
                     <div class="node-row"><span>Áp suất:</span><span class="node-val" id="map-jag1-p">-- MPa</span></div>
@@ -372,7 +372,7 @@
                 </div>
             </div>
 
-            <div class="scada-node" style="top: 67%; left: 23%;" data-id="JAGUAR_2">
+            <div class="scada-node" style="top: 600px; left: 290px;" data-id="JAGUAR_2">
                 <div class="node-title"><span>🐆 JAGUAR 2</span><div class="node-status"></div></div>
                 <div class="node-body" onclick="openSubSysDevice('JAGUAR_2', 'MÁY NÉN KHÍ JAGUAR 2')">
                     <div class="node-row"><span>Áp suất:</span><span class="node-val" id="map-jag2-p">-- MPa</span></div>
@@ -380,7 +380,7 @@
                 </div>
             </div>
 
-            <div class="scada-node" style="top: 67%; left: 41%;" data-id="JAGUAR_3">
+            <div class="scada-node" style="top: 600px; left: 500px;" data-id="JAGUAR_3">
                 <div class="node-title"><span>🐆 JAGUAR 3</span><div class="node-status"></div></div>
                 <div class="node-body" onclick="openSubSysDevice('JAGUAR_3', 'MÁY NÉN KHÍ JAGUAR 3')">
                     <div class="node-row"><span>Áp suất:</span><span class="node-val" id="map-jag3-p">-- MPa</span></div>
@@ -388,7 +388,7 @@
                 </div>
             </div>
 
-            <div class="scada-node" style="top: 67%; left: 58%;" data-id="JAGUAR_4">
+            <div class="scada-node" style="top: 600px; left: 710px;" data-id="JAGUAR_4">
                 <div class="node-title"><span>🐆 JAGUAR 4</span><div class="node-status"></div></div>
                 <div class="node-body" onclick="openSubSysDevice('JAGUAR_4', 'MÁY NÉN KHÍ JAGUAR 4')">
                     <div class="node-row"><span>Áp suất:</span><span class="node-val" id="map-jag4-p">-- MPa</span></div>
@@ -595,7 +595,6 @@
             document.removeEventListener('mouseup', stopDragging);
         }
 
-        // Bật/Tắt chế độ tọa độ để tinh chỉnh vị trí nếu muốn
         function toggleCoordinateMode() {
             isCoordinateMode = !isCoordinateMode;
             const btn = document.getElementById('btn-toggle-coord');
@@ -628,11 +627,11 @@
             document.addEventListener('mousemove', (e) => {
                 if (!isDraggingNode || !isCoordinateMode) return;
                 let boxRect = document.getElementById('layout-box-main').getBoundingClientRect();
-                let newX = ((e.clientX - boxRect.left - dStartX) / boxRect.width) * 100;
-                let newY = ((e.clientY - boxRect.top - dStartY) / boxRect.height) * 100;
-                node.style.left = newX + '%';
-                node.style.top = newY + '%';
-                console.log(`[${node.getAttribute('data-id')}] -> top: ${newY.toFixed(2)}%, left: ${newX.toFixed(2)}%`);
+                let newX = e.clientX - boxRect.left - dStartX;
+                let newY = e.clientY - boxRect.top - dStartY;
+                node.style.left = newX + 'px';
+                node.style.top = newY + 'px';
+                console.log(`[${node.getAttribute('data-id')}] -> top: ${Math.round(newY)}px, left: ${Math.round(newX)}px`);
             });
 
             document.addEventListener('mouseup', () => {
@@ -640,7 +639,6 @@
             });
         });
 
-        // --- REALTIME CẬP NHẬT DỮ LIỆU ---
         const meterIds = ['2', '10', '13', '14', '15', '18', '19', '20', '21'];
         meterIds.forEach(id => {
             db.ref(`METER_${id}`).on('value', snap => {
