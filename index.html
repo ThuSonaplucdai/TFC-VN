@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hệ Thống SCADA Tổng Thể - Sơ Đồ Mặt Bằng Nhà Xưởng Thực Tế</title>
+    <title>Hệ Thống SCADA - Dò Tọa Độ Mặt Bằng</title>
     
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
@@ -29,7 +29,6 @@
             flex-direction: column; 
             align-items: center; 
             min-height: 100vh;
-            user-select: none;
         }
 
         .scada-header { 
@@ -45,7 +44,6 @@
             border: 1px solid var(--border-col);
         }
 
-        /* --- SƠ ĐỒ MẶT BẰNG TỔNG THỂ SCADA --- */
         .scada-floorplan-container {
             display: flex;
             gap: 20px;
@@ -63,7 +61,6 @@
             box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
             overflow: hidden;
             
-            /* DÙNG CHUNG 1 ẢNH NỀN mat_bang.jpg */
             background-image: url('mat_bang.jpg');
             background-position: center;
             background-repeat: no-repeat;
@@ -84,26 +81,16 @@
             z-index: 50;
         }
 
-        /* --- THẺ THIẾT BỊ TRÊN MẶT BẰNG (SCADA TAG NODE) --- */
+        /* --- THẺ THIẾT BỊ TRÊN MẶT BẰNG --- */
         .scada-node {
             position: absolute;
             background: var(--tag-bg);
             border: 1px solid var(--border-col);
             border-radius: 5px;
             padding: 6px 8px;
-            cursor: grab;
-            width: 165px;
-            transition: border-color 0.2s, box-shadow 0.2s;
+            width: 175px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.4);
             z-index: 10;
-        }
-
-        .scada-node:active { cursor: grabbing; }
-
-        .scada-node:hover {
-            border-color: var(--accent);
-            box-shadow: 0 0 12px rgba(56, 189, 248, 0.4);
-            z-index: 100;
         }
 
         .node-title {
@@ -132,6 +119,7 @@
             gap: 2px;
             font-size: 11px;
             font-family: monospace;
+            cursor: pointer;
         }
 
         .node-row {
@@ -142,7 +130,7 @@
 
         .node-val { font-weight: bold; color: #fff; }
 
-        /* --- CỬA SỔ NỔI WINDOWS (FLOATING WINDOW) --- */
+        /* --- CỬA SỔ NỔI WINDOWS --- */
         .scada-window {
             position: absolute;
             top: 100px;
@@ -169,7 +157,6 @@
             border-bottom: 1px solid var(--border-col);
             cursor: grab;
         }
-        .win-titlebar:active { cursor: grabbing; }
 
         .win-title {
             font-size: 12px;
@@ -196,7 +183,6 @@
             justify-content: center;
             font-size: 11px;
         }
-        .win-btn:hover { background: #475569; }
         .win-btn.close:hover { background: #ef4444; }
 
         .win-body {
@@ -206,7 +192,7 @@
             background: #1e293b;
         }
 
-        /* --- KHUNG GIAO DIỆN THIẾT BỊ GỐC --- */
+        /* --- KHUNG THIẾT BỊ GỐC --- */
         .meter-machine-frame { background: #cbd5e1; border: 6px solid #111; border-radius: 6px; color: #1e293b; overflow: hidden; width: 100%; max-width: 520px; margin: auto; font-family: monospace; }
         .meter-top-bar { background: #94a3b8; padding: 5px 10px; display: flex; justify-content: space-between; font-weight: bold; font-size: 11px; border-bottom: 2px solid #64748b; }
         .meter-content { height: 240px; padding: 10px; background: #e2e8f0; display: flex; flex-direction: column; justify-content: space-around; }
@@ -233,69 +219,67 @@
 </head>
 <body>
 
-    <!-- Header SCADA -->
     <div class="scada-header">
-        <h1 style="margin: 0; font-size: 15px;">🏭 HỆ THỐNG SCADA - CĂN CHỈNH TỌA ĐỘ MẶT BẰNG</h1>
+        <h1 style="margin: 0; font-size: 15px;">🏭 HỆ THỐNG SCADA - HIỂN THỊ TỌA ĐỘ TỪNG THIẾT BỊ</h1>
         <span id="global-conn" style="font-size: 11px;">📶 Đang kết nối...</span>
     </div>
 
-    <!-- KHUNG CHỨA 2 MẶT BẰNG -->
     <div class="scada-floorplan-container">
 
         <!-- ================= MẶT BẰNG XƯỞNG 01 ================= -->
         <div class="factory-layout-box">
             <div class="layout-title">📍 MẶT BẰNG XƯỞNG 01</div>
 
-            <div class="scada-node" style="top: 80px; left: 320px;" data-id="METER_13">
-                <div class="node-title"><span>⚡ METER 13</span><div class="node-status"></div></div>
+            <div class="scada-node" style="top: 80px; left: 320px;">
+                <div class="node-title"><span class="pos-label">METER 13</span><div class="node-status"></div></div>
                 <div class="node-body" onclick="openMeterDevice('13')">
                     <div class="node-row"><span>Vavg:</span><span class="node-val" id="map-v-13">-- V</span></div>
                     <div class="node-row"><span>Ptot:</span><span class="node-val" id="map-p-13">-- kW</span></div>
                 </div>
             </div>
 
-            <div class="scada-node" style="top: 180px; left: 450px;" data-id="METER_2">
-                <div class="node-title"><span>⚡ METER 2</span><div class="node-status"></div></div>
+            <div class="scada-node" style="top: 180px; left: 450px;">
+                <div class="node-title"><span class="pos-label">METER 2</span><div class="node-status"></div></div>
                 <div class="node-body" onclick="openMeterDevice('2')">
                     <div class="node-row"><span>Vavg:</span><span class="node-val" id="map-v-2">-- V</span></div>
                     <div class="node-row"><span>Ptot:</span><span class="node-val" id="map-p-2">-- kW</span></div>
                 </div>
             </div>
 
-            <div class="scada-node" style="top: 260px; left: 240px;" data-id="METER_15">
-                <div class="node-title"><span>⚡ METER 15</span><div class="node-status"></div></div>
+            <div class="scada-node" style="top: 260px; left: 240px;">
+                <div class="node-title"><span class="pos-label">METER 15</span><div class="node-status"></div></div>
                 <div class="node-body" onclick="openMeterDevice('15')">
                     <div class="node-row"><span>Vavg:</span><span class="node-val" id="map-v-15">-- V</span></div>
                     <div class="node-row"><span>Ptot:</span><span class="node-val" id="map-p-15">-- kW</span></div>
                 </div>
             </div>
 
-            <div class="scada-node" style="top: 100px; left: 580px;" data-id="JAGUAR_4">
-                <div class="node-title"><span>🐆 JAGUAR 4</span><div class="node-status"></div></div>
+            <div class="scada-node" style="top: 100px; left: 580px;">
+                <div class="node-title"><span class="pos-label">JAGUAR 4</span><div class="node-status"></div></div>
                 <div class="node-body" onclick="openSubSysDevice('JAGUAR_4', 'MÁY NÉN KHÍ JAG-04')">
                     <div class="node-row"><span>Áp suất:</span><span class="node-val" id="map-jag4-p">-- MPa</span></div>
                     <div class="node-row"><span>Nhiệt độ:</span><span class="node-val" id="map-jag4-t">-- °C</span></div>
                 </div>
             </div>
 
-            <div class="scada-node" style="top: 320px; left: 620px;" data-id="JAGUAR_3">
-                <div class="node-title"><span>🐆 JAGUAR 3</span><div class="node-status"></div></div>
+            <div class="scada-node" style="top: 320px; left: 620px;">
+                <div class="node-title"><span class="pos-label">JAGUAR 3</span><div class="node-status"></div></div>
                 <div class="node-body" onclick="openSubSysDevice('JAGUAR_3', 'MÁY NÉN KHÍ JAG-03')">
                     <div class="node-row"><span>Áp suất:</span><span class="node-val" id="map-jag3-p">-- MPa</span></div>
                     <div class="node-row"><span>Nhiệt độ:</span><span class="node-val" id="map-jag3-t">-- °C</span></div>
                 </div>
             </div>
 
-            <div class="scada-node" style="top: 480px; left: 500px;" data-id="JAGUAR_2">
-                <div class="node-title"><span>🐆 JAGUAR 2</span><div class="node-status"></div></div>
+            <div class="scada-node" style="top: 480px; left: 500px;">
+                <div class="node-title"><span class="pos-label">JAGUAR 2</span><div class="node-status"></div></div>
                 <div class="node-body" onclick="openSubSysDevice('JAGUAR_2', 'MÁY NÉN KHÍ JAG-02')">
                     <div class="node-row"><span>Áp suất:</span><span class="node-val" id="map-jag2-p">-- MPa</span></div>
                     <div class="node-row"><span>Nhiệt độ:</span><span class="node-val" id="map-jag2-t">-- °C</span></div>
                 </div>
             </div>
 
-            <div class="scada-node" style="top: 640px; left: 360px;" data-id="JAGUAR_1">
-                <div class="node-title"><span>🐆 JAGUAR 1</span><div class="node-status"></div></div>
+            <div class="scada-node" style="top: 640px; left: 360px;">
+                <div class="node-title"><span class="pos-label">JAGUAR 1</span><div class="node-status"></div></div>
                 <div class="node-body" onclick="openSubSysDevice('JAGUAR_1', 'MÁY NÉN KHÍ JAG-01')">
                     <div class="node-row"><span>Áp suất:</span><span class="node-val" id="map-jag1-p">-- MPa</span></div>
                     <div class="node-row"><span>Nhiệt độ:</span><span class="node-val" id="map-jag1-t">-- °C</span></div>
@@ -307,40 +291,40 @@
         <div class="factory-layout-box">
             <div class="layout-title">📍 MẶT BẰNG XƯỞNG 02</div>
 
-            <div class="scada-node" style="top: 80px; left: 320px;" data-id="METER_14">
-                <div class="node-title"><span>⚡ METER 14</span><div class="node-status"></div></div>
+            <div class="scada-node" style="top: 80px; left: 320px;">
+                <div class="node-title"><span class="pos-label">METER 14</span><div class="node-status"></div></div>
                 <div class="node-body" onclick="openMeterDevice('14')">
                     <div class="node-row"><span>Vavg:</span><span class="node-val" id="map-v-14">-- V</span></div>
                     <div class="node-row"><span>Ptot:</span><span class="node-val" id="map-p-14">-- kW</span></div>
                 </div>
             </div>
 
-            <div class="scada-node" style="top: 200px; left: 200px;" data-id="METER_18">
-                <div class="node-title"><span>⚡ METER 18</span><div class="node-status"></div></div>
+            <div class="scada-node" style="top: 200px; left: 200px;">
+                <div class="node-title"><span class="pos-label">METER 18</span><div class="node-status"></div></div>
                 <div class="node-body" onclick="openMeterDevice('18')">
                     <div class="node-row"><span>Vavg:</span><span class="node-val" id="map-v-18">-- V</span></div>
                     <div class="node-row"><span>Ptot:</span><span class="node-val" id="map-p-18">-- kW</span></div>
                 </div>
             </div>
 
-            <div class="scada-node" style="top: 200px; left: 480px;" data-id="METER_19">
-                <div class="node-title"><span>⚡ METER 19</span><div class="node-status"></div></div>
+            <div class="scada-node" style="top: 200px; left: 480px;">
+                <div class="node-title"><span class="pos-label">METER 19</span><div class="node-status"></div></div>
                 <div class="node-body" onclick="openMeterDevice('19')">
                     <div class="node-row"><span>Vavg:</span><span class="node-val" id="map-v-19">-- V</span></div>
                     <div class="node-row"><span>Ptot:</span><span class="node-val" id="map-p-19">-- kW</span></div>
                 </div>
             </div>
 
-            <div class="scada-node" style="top: 380px; left: 380px;" data-id="METER_20">
-                <div class="node-title"><span>⚡ METER 20</span><div class="node-status"></div></div>
+            <div class="scada-node" style="top: 380px; left: 380px;">
+                <div class="node-title"><span class="pos-label">METER 20</span><div class="node-status"></div></div>
                 <div class="node-body" onclick="openMeterDevice('20')">
                     <div class="node-row"><span>Vavg:</span><span class="node-val" id="map-v-20">-- V</span></div>
                     <div class="node-row"><span>Ptot:</span><span class="node-val" id="map-p-20">-- kW</span></div>
                 </div>
             </div>
 
-            <div class="scada-node" style="top: 340px; left: 100px;" data-id="METER_21">
-                <div class="node-title"><span>⚡ METER 21</span><div class="node-status"></div></div>
+            <div class="scada-node" style="top: 340px; left: 100px;">
+                <div class="node-title"><span class="pos-label">METER 21</span><div class="node-status"></div></div>
                 <div class="node-body" onclick="openMeterDevice('21')">
                     <div class="node-row"><span>Vavg:</span><span class="node-val" id="map-v-21">-- V</span></div>
                     <div class="node-row"><span>Ptot:</span><span class="node-val" id="map-p-21">-- kW</span></div>
@@ -350,12 +334,11 @@
 
     </div>
 
-    <!-- ================= CỬA SỔ NỔI 1: GIAO DIỆN ĐO ĐIỆN ================= -->
+    <!-- CỬA SỔ NỔI ĐO ĐIỆN -->
     <div id="win-meter" class="scada-window">
-        <div class="win-titlebar" onmousedown="startDrag(event, 'win-meter')">
+        <div class="win-titlebar">
             <div class="win-title" id="meter-win-title">📊 Chi Tiết Thiết Bị Đo Điện</div>
             <div class="win-controls">
-                <button class="win-btn" onclick="minimizeWindow('win-meter')">🗕</button>
                 <button class="win-btn close" onclick="closeWindow('win-meter')">✕</button>
             </div>
         </div>
@@ -369,56 +352,29 @@
                         <div class="meter-row"><span class="meter-label">Ptot</span><span><span class="meter-val" id="val-ptot">--</span><span class="meter-unit">kW</span></span></div>
                         <div class="meter-row"><span class="meter-label">Etot</span><span><span class="meter-val" id="val-etot">--</span><span class="meter-unit">kVArh</span></span></div>
                     </div>
-                    <div id="m-screen-2" class="meter-screen">
-                        <div style="font-weight:bold; text-align:center; border-bottom:1px solid #94a3b8; padding-bottom:3px;">ĐIỆN ÁP PHA</div>
-                        <div class="meter-row"><span class="meter-label">Phase A</span><span><span class="meter-val" id="val-va">--</span><span class="meter-unit">V</span></span></div>
-                        <div class="meter-row"><span class="meter-label">Phase B</span><span><span class="meter-val" id="val-vb">--</span><span class="meter-unit">V</span></span></div>
-                        <div class="meter-row"><span class="meter-label">Phase C</span><span><span class="meter-val" id="val-vc">--</span><span class="meter-unit">V</span></span></div>
-                    </div>
-                    <div id="m-screen-3" class="meter-screen">
-                        <div style="font-weight:bold; text-align:center; border-bottom:1px solid #94a3b8; padding-bottom:3px;">DÒNG ĐIỆN PHA</div>
-                        <div class="meter-row"><span class="meter-label">Current A</span><span><span class="meter-val" id="val-ia">--</span><span class="meter-unit">A</span></span></div>
-                        <div class="meter-row"><span class="meter-label">Current B</span><span><span class="meter-val" id="val-ib">--</span><span class="meter-unit">A</span></span></div>
-                        <div class="meter-row"><span class="meter-label">Current C</span><span><span class="meter-val" id="val-ic">--</span><span class="meter-unit">A</span></span></div>
-                    </div>
-                </div>
-                <div class="meter-nav-btns">
-                    <div class="m-btn" onclick="prevMeterPage()">◀ PREV</div>
-                    <div class="m-btn" id="m-page-indicator" style="background:#1e293b; cursor:default;">TRANG 1 / 3</div>
-                    <div class="m-btn" onclick="nextMeterPage()" style="background:#0284c7;">NEXT ▶</div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- ================= CỬA SỔ NỔI 2: GIAO DIỆN MÁY NÉN KHÍ JAGUAR ================= -->
+    <!-- CỬA SỔ NỔI MÁY NÉN KHÍ -->
     <div id="win-sub" class="scada-window">
-        <div class="win-titlebar" onmousedown="startDrag(event, 'win-sub')">
+        <div class="win-titlebar">
             <div class="win-title" id="sub-win-title">🐆 Giao Diện Máy Nén Khí</div>
             <div class="win-controls">
-                <button class="win-btn" onclick="minimizeWindow('win-sub')">🗕</button>
                 <button class="win-btn close" onclick="closeWindow('win-sub')">✕</button>
             </div>
         </div>
         <div class="win-body">
             <div class="jg-machine-frame">
-                <div class="jg-top-bar"><span>捷豹 JAGUAR SYSTEM</span><span id="sub-conn">📶 Online</span></div>
+                <div class="jg-top-bar"><span>JAGUAR SYSTEM</span><span id="sub-conn">📶 Online</span></div>
                 <div class="jg-content">
                     <div id="jg-home" class="jg-screen active">
-                        <p style="text-align:center; font-weight:bold; margin-bottom:8px; font-size:11px;">Realtime Parameters</p>
                         <div class="jg-data-grid">
                             <div class="jg-box">Press(MPa): <span class="jg-blue" id="jg-p">--</span></div>
                             <div class="jg-box">Temp(°C): <span class="jg-blue" id="jg-t">--</span></div>
-                            <div class="jg-box">Volt(V): <span class="jg-blue" id="jg-v">--</span></div>
-                            <div class="jg-box">Freq(Hz): <span class="jg-blue" id="jg-f">--</span></div>
                         </div>
                     </div>
-                </div>
-                <div class="jg-physical-btns">
-                    <div class="p-btn" style="background:#0369a1">HOME</div>
-                    <div class="p-btn" style="background:#475569">MENU</div>
-                    <div class="p-btn" style="background:#15803d">START</div>
-                    <div class="p-btn" style="background:#b91c1c">STOP</div>
                 </div>
             </div>
         </div>
@@ -429,79 +385,21 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        let activeMeterId = '2';
-        let meterPage = 1;
-        let meterListener = null;
-        let subListener = null;
-
-        function openWindow(id) {
-            const win = document.getElementById(id);
-            if(win) { win.classList.add('active'); bringToFront(win); }
-        }
+        function openWindow(id) { document.getElementById(id).classList.add('active'); }
         function closeWindow(id) { document.getElementById(id).classList.remove('active'); }
-        function minimizeWindow(id) {
-            const body = document.querySelector(`#${id} .win-body`);
-            if(body) body.style.display = body.style.display === 'none' ? 'block' : 'none';
-        }
 
-        let zIndexTop = 1000;
-        function bringToFront(win) { win.style.zIndex = ++zIndexTop; }
-
-        let dragTarget = null, startX = 0, startY = 0;
-        function startDrag(e, id) {
-            dragTarget = document.getElementById(id);
-            bringToFront(dragTarget);
-            const rect = dragTarget.getBoundingClientRect();
-            startX = e.clientX - rect.left;
-            startY = e.clientY - rect.top;
-            document.addEventListener('mousemove', onDragging);
-            document.addEventListener('mouseup', stopDragging);
-        }
-        function onDragging(e) {
-            if(!dragTarget) return;
-            let x = e.clientX - startX;
-            let y = e.clientY - startY;
-            dragTarget.style.left = Math.max(0, x) + 'px';
-            dragTarget.style.top = Math.max(0, y) + 'px';
-        }
-        function stopDragging() {
-            dragTarget = null;
-            document.removeEventListener('mousemove', onDragging);
-            document.removeEventListener('mouseup', stopDragging);
-        }
-
-        // === TÍNH NĂNG KÉO THẢ THIẾT BỊ ĐỂ DÒ VỊ TRÍ (TEST MODE) ===
+        // --- ĐOẠN CODE TỰ ĐỘNG HIỂN THỊ TỌA ĐỘ LÊN GIAO DIỆN ---
         document.querySelectorAll('.scada-node').forEach(node => {
-            let isDraggingNode = false;
-            let dStartX, dStartY;
-
-            node.addEventListener('mousedown', (e) => {
-                isDraggingNode = true;
-                dStartX = e.clientX - node.offsetLeft;
-                dStartY = e.clientY - node.offsetTop;
-                node.style.zIndex = 10000;
-                e.stopPropagation();
-            });
-
-            document.addEventListener('mousemove', (e) => {
-                if (!isDraggingNode) return;
-                let newX = e.clientX - dStartX;
-                let newY = e.clientY - dStartY;
-                node.style.left = newX + 'px';
-                node.style.top = newY + 'px';
-                
-                // In tọa độ trực tiếp ra Console (Nhấn F12 để xem)
-                const nameId = node.getAttribute('data-id');
-                console.log(`[${nameId}] -> top: ${newY}px, left: ${newX}px`);
-            });
-
-            document.addEventListener('mouseup', () => {
-                isDraggingNode = false;
-            });
+            const topVal = node.style.top;
+            const leftVal = node.style.left;
+            const titleSpan = node.querySelector('.pos-label');
+            if (titleSpan) {
+                titleSpan.innerHTML += ` <span style="font-size:9px; color:#facc15;">(T:${topVal}, L:${leftVal})</span>`;
+            }
         });
 
-        const meterIds = ['2', '3', '13', '14', '15', '18', '19', '20', '21'];
-        meterIds.forEach(id => {
+        // Lấy dữ liệu Firebase cho Meter
+        ['2', '3', '13', '14', '15', '18', '19', '20', '21'].forEach(id => {
             db.ref(`METER_${id}`).on('value', snap => {
                 const d = snap.val();
                 if(d) {
@@ -513,8 +411,8 @@
             });
         });
 
-        const jagIds = ['1', '2', '3', '4'];
-        jagIds.forEach(id => {
+        // Lấy dữ liệu Firebase cho Jaguar
+        ['1', '2', '3', '4'].forEach(id => {
             db.ref(`JAGUAR_${id}`).on('value', snap => {
                 const d = snap.val();
                 if(d) {
@@ -527,61 +425,14 @@
         });
 
         function openMeterDevice(id) {
-            if(meterListener && activeMeterId) db.ref(`METER_${activeMeterId}`).off('value', meterListener);
-            activeMeterId = id;
             document.getElementById('meter-win-title').innerText = `📊 Chi Tiết Thiết Bị Đo Điện - METER ${id}`;
             openWindow('win-meter');
-
-            meterListener = db.ref(`METER_${id}`).on('value', snap => {
-                const d = snap.val();
-                if(!d) return;
-                document.getElementById('val-vavg').innerText = d.v_avg || '--';
-                document.getElementById('val-aavg').innerText = d.a_avg || '--';
-                document.getElementById('val-ptot').innerText = d.congsuattucthoi || '--';
-                document.getElementById('val-etot').innerText = d.congsuattong || '--';
-                document.getElementById('val-va').innerText = d.pha_a || '--';
-                document.getElementById('val-vb').innerText = d.pha_b || '--';
-                document.getElementById('val-vc').innerText = d.pha_c || '--';
-                document.getElementById('val-ia').innerText = d.dong_a || '--';
-                document.getElementById('val-ib').innerText = d.dong_b || '--';
-                document.getElementById('val-ic').innerText = d.dong_c || '--';
-            });
         }
 
         function openSubSysDevice(key, name) {
-            if(subListener) db.ref(subListener).off('value');
-            subListener = key;
             document.getElementById('sub-win-title').innerText = `🐆 ${name}`;
             openWindow('win-sub');
-
-            db.ref(key).on('value', snap => {
-                const d = snap.val();
-                if(!d) return;
-                document.getElementById('jg-p').innerText = d.pressure || '--';
-                document.getElementById('jg-t').innerText = d.temperature || '--';
-                document.getElementById('jg-v').innerText = d.voltage || '--';
-                document.getElementById('jg-f').innerText = d.frequency || '--';
-            });
         }
-
-        function nextMeterPage() { meterPage = meterPage >= 3 ? 1 : meterPage + 1; updateMeterScreen(); }
-        function prevMeterPage() { meterPage = meterPage <= 1 ? 3 : meterPage - 1; updateMeterScreen(); }
-        function updateMeterScreen() {
-            for(let i=1; i<=3; i++) {
-                const s = document.getElementById(`m-screen-${i}`);
-                if(s) {
-                    s.style.display = (i === meterPage) ? 'flex' : 'none';
-                    s.classList.toggle('active', i === meterPage);
-                }
-            }
-            document.getElementById('m-page-indicator').innerText = `TRANG ${meterPage} / 3`;
-        }
-
-        setInterval(() => {
-            const now = new Date();
-            document.getElementById('m-date').innerText = `📅 ${now.toISOString().slice(0,10)}`;
-            document.getElementById('m-time').innerText = `🕒 ${now.toTimeString().slice(0,8)}`;
-        }, 1000);
 
         db.ref(".info/connected").on("value", snap => {
             const status = snap.val() ? "📶 Online" : "❌ Offline";
